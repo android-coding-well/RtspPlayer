@@ -1,0 +1,61 @@
+apply plugin: 'com.android.application'
+apply plugin: 'bugly'
+bugly {
+    appId = "6b437c22dc" // 注册时分配的App ID
+    appKey = "e7391b81-101a-4cce-a6fc-15fcae6d4e7f" // 注册时分配的App Key
+    debug=true
+    upload=true
+}
+android {
+    compileSdkVersion 24
+    buildToolsVersion "24.0.0"
+    dataBinding {
+        enabled = true
+    }
+
+    splits {
+        abi {
+            enable true
+            reset()
+            include 'armeabi'
+            universalApk false
+        }
+    }
+    defaultConfig {
+        applicationId "com.gosuncn.mpa"
+        minSdkVersion 18
+        targetSdkVersion 24
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+        ndk {
+            // 设置支持的SO库架构
+            abiFilters 'armeabi' //, 'x86', 'armeabi-v7a', 'x86_64', 'arm64-v8a'
+        }
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            jniDebuggable true
+            renderscriptDebuggable true
+        }
+    }
+
+}
+
+dependencies {
+    compile fileTree(include: ['*.jar'], dir: 'libs')
+    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    })
+    compile 'com.android.support:appcompat-v7:24.2.1'
+    testCompile 'junit:junit:4.12'
+    compile project(':mplayer')
+
+    compile 'com.tencent.bugly:crashreport:latest.release' //其中latest.release指代最新版本号，也可以指定明确的版本号，例如2.1.5
+    compile 'com.tencent.bugly:nativecrashreport:latest.release' //其中latest.release指代最新版本号，也可以指定明确的版本号，例如2.2.0
+}
