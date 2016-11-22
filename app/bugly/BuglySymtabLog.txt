@@ -222,3 +222,7 @@ symbolFile=F:\AS_workspace3\RtspPlayer\app\bugly\buglySymbol_libnative-lib_armea
 file=F:\AS_workspace3\RtspPlayer\mplayer\build\intermediates\cmake\release\obj\armeabi\libnative-lib.so
 uuid=b829590745ef7d6644d5b18e6c3c4243
 
+symbolFile=F:\AS_workspace3\RtspPlayer\app\bugly\buglySymbol_libnative-lib_armeabi-v5te-a75d2.zip
+file=F:\AS_workspace3\RtspPlayer\mplayer\build\intermediates\cmake\release\obj\armeabi\libnative-lib.so
+uuid=a75d24a3531dc30b8df1945f7b1059b0
+

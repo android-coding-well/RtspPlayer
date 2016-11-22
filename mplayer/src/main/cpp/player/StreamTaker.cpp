@@ -94,6 +94,9 @@ int StreamTaker::prepare(const char * url) {
 }
 
 void StreamTaker::startTakeStream() {
+    if(!isPrepareSuccess){
+        return;
+    }
     AVPacket packet;
     isTake=true;
     while (av_read_frame(pFormatCtx, &packet) >= 0&&isTake ) {

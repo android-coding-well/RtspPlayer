@@ -33,7 +33,7 @@ public class TestPlayer1Activity extends AppCompatActivity {
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_test_player1);
 
-        binding.etRtspUrl.setText("rtsp://192.168.28.17:8554/2.264");
+        binding.etRtspUrl.setText("rtsp://192.168.28.17/2.264");
         binding.etRtspUrl2.setText(Environment.getExternalStorageDirectory().toString() + "/test.mp4");
 
         binding.rpVideo.setOnRtspPlayResultListener(new RtspPlayer.OnRtspPlayResultListener() {

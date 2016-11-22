@@ -222,3 +222,7 @@ file=F:\AS_workspace3\RtspPlayer\app\bugly\buglySymbol_libnative-lib_armeabi-v5t
 sha1=60e7b3667c17134c3089d536dba6e646a354029a
 appId=6b437c22dc
 
+file=F:\AS_workspace3\RtspPlayer\app\bugly\buglySymbol_libnative-lib_armeabi-v5te-a75d2.zip
+sha1=ea069d3a508c2c215ac231fa8a7f4c14cb5d5fbe
+appId=6b437c22dc
+

@@ -87,7 +87,7 @@ public class RtspPlayer extends GLSurfaceView {
             public void handleMessage(Message msg) {
                 switch(msg.what){
                     case MESSAGE_TYPE_PLAY_PREPARE://prepare
-                        int ret = PlayerJNI.getInstance().prepare2(mPlayerHandle, (String)msg.obj);
+                        int ret = PlayerJNI.getInstance().prepare(mPlayerHandle, (String)msg.obj);
                         handler.sendMessage(handler.obtainMessage(MESSAGE_TYPE_PLAY_CALLBACK, ret, 0, PlayerJNI.getInstance().getMessageByReturnCode(ret)));
                         if (ret == 1) {
                             PlayerJNI.getInstance().startPlay(mPlayerHandle);
