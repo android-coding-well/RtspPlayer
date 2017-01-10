@@ -2,6 +2,7 @@
 
 一款支持多路的实时流媒体播放器
 
+第一版只是理通了流程，实际上还是有许多缺陷，正在加紧更新中，敬请期待...
 ---
 
 ![一路视频](https://github.com/huweijian5/RtspPlayer/blob/master/screenshots/QQ%E6%88%AA%E5%9B%BE20161118154722.png)
