@@ -26,18 +26,19 @@ public :
     //frameWidth:帧宽度
     //frameHeight:帧高度
     //frameHeight:帧高度
-    //pix_fmt:视频格式
+    //pix_fmt:视频数据格式,见AVPixelFormat，一般为AV_PIX_FMT_YUV420P
+    //return: 1--success
     int prepareYUV2RGB(int frameWidth, int frameHeight, AVPixelFormat pix_fmt);
 
     //开始转换(需要prepareYUV2RGB返回成功)
-    //pFrame:YUV帧
-    //return :转换后的帧数据
+    //pFrame:YUV帧（YUV420P）
+    //return :转换后的帧数据,NULL则表示转换失败
     AVFrame *YUV2RGB(AVFrame *pFrame);
 
     //开始转换（需要prepareYUV2RGB返回成功）
-    //data:YUV数据
+    //data:YUV数据（YUV420P）
     //size:YUV大小
-    //return :转换后的帧数据
+    //return :转换后的帧数据,NULL则表示转换失败
     AVFrame *YUV2RGB(uint8_t ** data,int size[]);
 
     //将音频数据转为非平面16位数据
@@ -50,6 +51,8 @@ public :
     bool isPreparedYUV2RGBSuccess();
 
 private :
+
+    uint8_t * rgbBuffer=NULL;
     bool isPrepareYUV2RGBSuccess = false;
 
     struct SwsContext *sws_ctx=NULL;

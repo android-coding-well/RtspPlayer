@@ -19,6 +19,9 @@ public :
 
     ~RGBRenderer();
 
+    //重置参数
+    void reset();
+
     //渲染前准备相关资源
     //nativeWindow：渲染窗体
     //frameWidth:视频帧宽度（非窗体宽度）
@@ -28,28 +31,33 @@ public :
 
     //渲染rgb数据
     //pFrameRGBA:转换后的rgb帧
-    void render(AVFrame *pFrameRGBA);
+    //return 1--success
+    int render(AVFrame *pFrameRGBA);
 
     //渲染rgb数据
     //rgbData:rgb数据
     //size:大小
-    void render(uint8_t *rgbData, int size);
+    //return 1--success
+    int render(uint8_t *rgbData, int size);
 
     //清除画面，即黑屏
     void clearScreen();
 
     bool isPreparedSuccess();
 
+
 private :
+
     bool isPrepareSuccess = false;
     ANativeWindow *nativeWindow=NULL;
     ANativeWindow_Buffer windowBuffer;
 
-    int frameWidth;
-    int frameHeight;
+    int frameWidth=0;
+    int frameHeight=0;
 
     //黑屏帧
     AVFrame *pBlackFrame = NULL;
+    uint8_t * rgbBuffer=NULL;
 };
 
 

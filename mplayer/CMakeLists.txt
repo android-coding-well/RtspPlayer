@@ -10,7 +10,7 @@ cmake_minimum_required(VERSION 3.4.1)
 # Gradle automatically packages shared libraries with your APK.
 
 add_library( # Sets the name of the library.
-             native-lib
+             streamhandler-lib
 
              # Sets the library as a shared library.
              SHARED
@@ -19,7 +19,10 @@ add_library( # Sets the name of the library.
              # Associated headers in the same location as their source
              # file are automatically included.
              src/main/cpp/native-lib.cpp
-             src/main/cpp/player/MediaPlayer.cpp
+             src/main/cpp/streamhandler-lib.cpp
+             src/main/cpp/demo/MediaPlayer.cpp
+             src/main/cpp/demo/MediaPlayer2.cpp
+             src/main/cpp/player/RtspPlayer.cpp
              src/main/cpp/player/YUV420PRenderer.cpp
              src/main/cpp/player/RetCode.cpp
              src/main/cpp/player/Codec.cpp
@@ -28,7 +31,7 @@ add_library( # Sets the name of the library.
              src/main/cpp/player/AudioPlayer.cpp
              src/main/cpp/player/Convertor.cpp
              src/main/cpp/player/RGBRenderer.cpp
-             src/main/cpp/common/GThread.cpp)
+             )
 
 
 #Add other prebuilt libraries
@@ -85,7 +88,7 @@ find_library( # Sets the name of the path variable.
 # build script, prebuilt third-party libraries, or system libraries.
 
 target_link_libraries( # Specifies the target library.
-                       native-lib
+                       streamhandler-lib
                        avcodec-lib
                        avdevice-lib
                        avfilter-lib

@@ -7,6 +7,7 @@ import android.view.View;
 
 import com.gosuncn.mpa.player1.TestPlayer1Activity;
 import com.gosuncn.mpa.player2.TestPlayer2Activity;
+import com.gosuncn.mpa.player3.TestPlayer3Activity;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -22,6 +23,14 @@ public class MainActivity extends AppCompatActivity {
     }
     public void onPlayer2Click(View view) {
         Intent intent = new Intent(this, TestPlayer2Activity.class);
+        startActivity(intent);
+    }
+    public void onPlayer3Click(View view) {
+        Intent intent = new Intent(this, TestPlayer3Activity.class);
+        startActivity(intent);
+    }
+    public void onComparisonClick(View view) {
+        Intent intent = new Intent(this, CompareActivity.class);
         startActivity(intent);
     }
 }

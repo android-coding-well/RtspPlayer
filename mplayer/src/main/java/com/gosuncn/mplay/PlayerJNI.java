@@ -1,12 +1,13 @@
 package com.gosuncn.mplay;
 
 /**
+ * 服务于RtspPlayer和RtspPlayer2
  * Created by hwj on 2016/10/18.
  */
 
 public class PlayerJNI {
     static {
-        System.loadLibrary("native-lib");
+        System.loadLibrary("streamhandler-lib");
     }
     private PlayerJNI(){}
     private static PlayerJNI instance;

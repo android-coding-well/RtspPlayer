@@ -18,7 +18,6 @@ extern "C" {
 #include "libswresample/swresample.h"
 };
 
-
 class AudioPlayer {
 public :
     AudioPlayer();

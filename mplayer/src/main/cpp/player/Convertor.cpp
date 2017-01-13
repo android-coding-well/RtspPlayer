@@ -15,23 +15,14 @@ Convertor::~Convertor() {
         av_frame_free(&pFrameRGBA);
         pFrameRGBA=NULL;
     }
-
+    if(rgbBuffer!=NULL){
+        av_free(rgbBuffer);
+        rgbBuffer=NULL;
+    }
 
 }
 
 AVFrame * Convertor::YUV2RGB(AVFrame *pFrame) {
-   /* if (pFrame == NULL) {
-        return NULL;
-    }
-    if (isPrepareYUV2RGBSuccess == false) {
-        return NULL;
-    }
-    // 格式转换
-    sws_scale(sws_ctx, (uint8_t const *const *) pFrame->data,
-              pFrame->linesize, 0, frameHeight,
-              pFrameRGBA->data, pFrameRGBA->linesize);
-
-    return pFrameRGBA;*/
     return YUV2RGB(pFrame->data, pFrame->linesize);
 }
 
@@ -66,13 +57,19 @@ int Convertor::prepareYUV2RGB(int frameWidth, int frameHeight, AVPixelFormat pix
     this->frameHeight = frameHeight;
 
     // Determine required buffer size and allocate buffer
-    // buffer中数据就是用于渲染的,且格式为RGBA
+    // rgbBuffer中数据就是用于渲染的,且格式为RGBA
     int numBytes = av_image_get_buffer_size(AV_PIX_FMT_RGBA,  frameWidth, frameHeight,1);
-    LOGI("prepare21");
-    uint8_t *buffer = (uint8_t *) av_malloc(numBytes * sizeof(uint8_t));
-    LOGI("prepare22");
-    av_image_fill_arrays( pFrameRGBA->data,  pFrameRGBA->linesize, buffer, AV_PIX_FMT_RGBA,
-                          frameWidth, frameHeight, 1);
+    LOGI("av_image_get_buffer_size=%d",numBytes);
+    rgbBuffer = (uint8_t *) av_malloc(numBytes * sizeof(uint8_t));
+    if(rgbBuffer==NULL){
+        LOGI("av_malloc buffer failed,please try again");
+        return -1;
+    }
+    if(av_image_fill_arrays( pFrameRGBA->data,  pFrameRGBA->linesize, rgbBuffer, AV_PIX_FMT_RGBA,
+                          frameWidth, frameHeight, 1)<0){
+        LOGI("av_image_fill_arrays failed");
+        return -1;
+    };
     sws_ctx = sws_getContext(frameWidth,
                              frameHeight,
                              pix_fmt,
@@ -83,6 +80,11 @@ int Convertor::prepareYUV2RGB(int frameWidth, int frameHeight, AVPixelFormat pix
                              NULL,
                              NULL,
                              NULL);
+    if(sws_ctx==NULL){
+        LOGI("sws_getContext failed");
+        return -1;
+    }
+    LOGI("prepareYUV2RGB success");
     isPrepareYUV2RGBSuccess=true;
     return 1;
 }

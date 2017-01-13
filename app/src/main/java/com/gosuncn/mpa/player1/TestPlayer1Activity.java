@@ -33,7 +33,7 @@ public class TestPlayer1Activity extends AppCompatActivity {
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_test_player1);
 
-        binding.etRtspUrl.setText("rtsp://192.168.28.17/2.264");
+        binding.etRtspUrl.setText("rtsp://192.168.16.135/video/264/tc10.264");
         binding.etRtspUrl2.setText(Environment.getExternalStorageDirectory().toString() + "/test.mp4");
 
         binding.rpVideo.setOnRtspPlayResultListener(new RtspPlayer.OnRtspPlayResultListener() {
@@ -80,6 +80,7 @@ public class TestPlayer1Activity extends AppCompatActivity {
     public void onCapture1Click(View view) {
         final String path = dir + "/test/rtsp1_" + new Date().getTime() + ".png";
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},0);
             Toast.makeText(this, "请允许写权限", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -88,6 +89,7 @@ public class TestPlayer1Activity extends AppCompatActivity {
 
     public void onCapture2Click(View view) {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},0);
             Toast.makeText(this, "请允许写权限", Toast.LENGTH_SHORT).show();
             return;
         }

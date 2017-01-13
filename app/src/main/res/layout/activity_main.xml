@@ -22,5 +22,17 @@
         android:layout_marginTop="20dp"
         android:onClick="onPlayer2Click"
         android:text="player2"/>
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:onClick="onPlayer3Click"
+        android:text="player3"/>
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:onClick="onComparisonClick"
+        android:text="comparison"/>
 
 </LinearLayout>

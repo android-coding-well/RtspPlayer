@@ -22,6 +22,9 @@ import javax.microedition.khronos.egl.EGLContext;
 import javax.microedition.khronos.egl.EGLDisplay;
 import javax.microedition.khronos.opengles.GL10;
 
+/**
+ * 此播放器采用YUV渲染
+ */
 public class RtspPlayer extends GLSurfaceView {
     private static String TAG = "RtspPlayer";
     private static final int MESSAGE_TYPE_PLAY_CALLBACK=1;

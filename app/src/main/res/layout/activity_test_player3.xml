@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <LinearLayout
+        android:id="@+id/activity_test_player3"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingBottom="@dimen/activity_vertical_margin"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingTop="@dimen/activity_vertical_margin"
+        android:orientation="vertical"
+        tools:context="com.gosuncn.mpa.player3.TestPlayer3Activity">
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:onClick="onFourScreenClick"
+            android:text="四分屏"/>
+        <EditText
+            android:id="@+id/et_rtsp_url"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="rtsp url" />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="200dp">
+
+            <com.gosuncn.mplay.RtspPlayer3
+                android:id="@+id/rp_video"
+                android:layout_width="match_parent"
+                android:layout_height="300dp" />
+
+            <ProgressBar
+                android:id="@+id/pb_loading"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:visibility="gone"
+                tools:visibility="visible" />
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="#00ffff"
+                        android:text="接收视/音帧数："/>
+                    <TextView
+                        android:id="@+id/tv_frame1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="#00ffff"
+                        android:text="-"/>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="#00ffff"
+                        android:text="解码视/音帧数："/>
+                    <TextView
+                        android:id="@+id/tv_decode1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="#00ffff"
+                        android:text="-"/>
+
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="#00ffff"
+                        android:text="失败视/音帧数："/>
+                    <TextView
+                        android:id="@+id/tv_decode_failed1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="#00ffff"
+                        android:text="-"/>
+
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="#00ffff"
+                        android:text="渲染视/音帧数："/>
+                    <TextView android:id="@+id/tv_render1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="#00ffff"
+                        android:text="-"/>
+                </LinearLayout>
+            </LinearLayout>
+        </RelativeLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btn_play"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="onPlay1Click"
+                android:text="play" />
+
+            <Button
+                android:id="@+id/btn_stop"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="onStop1Click"
+                android:text="stop" />
+
+            <Button
+                android:id="@+id/btn_capture"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="onCapture1Click"
+                android:text="capture" />
+
+            <ToggleButton
+                android:id="@+id/tbtn_sound1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="onSound1Click"
+                android:textOff="声音关"
+                android:textOn="声音开" />
+
+
+        </LinearLayout>
+
+    </LinearLayout>
+</layout>

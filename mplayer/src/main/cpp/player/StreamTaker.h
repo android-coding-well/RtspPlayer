@@ -6,12 +6,13 @@
 #ifndef MEDIAAPP_STREAMTAKER_H
 #define MEDIAAPP_STREAMTAKER_H
 
-
 extern "C" {
 #include "libavformat/avformat.h"
 #include "libavutil/avutil.h"
 #include "libavcodec/avcodec.h"
 };
+
+#include <pthread.h>
 
 typedef void (*PacketCallback)(void *handle, AVPacket packet);
 
@@ -21,10 +22,14 @@ public :
 
     ~StreamTaker();
 
-    //设置原始数据包回调函数
+    //设置原始视频数据包回调函数
     //handle 回调设置者句柄
     //callback 回调函数
     void setVideoPacketCallback(void *handle, PacketCallback callback);
+
+    //设置原始音频数据包回调函数
+    //handle 回调设置者句柄
+    //callback 回调函数
     void setAudioPacketCallback(void *handle, PacketCallback callback);
 
     //取流准备
@@ -38,33 +43,52 @@ public :
     //停止取流
     void stopTakeStream();
 
-    //获得编码类型
+    //取流过程（阻塞、耗时，用户无需调用）
+    void takingStream();
+
+    //获得视频编码类型
     AVCodecID getVideoCodeID();
-    //获得编码类型
+
+    //获得音频编码类型
     AVCodecID getAudioCodeID();
+
+    //获得原始视频帧的宽度，在prepare后才有效
+    int getFrameWidth();
+
+    //获得原始视频帧的高度，在prepare后才有效
+    int getFrameHeight();
+
 private :
+
+    //是否取流
+    bool isTake = false;
+
+    AVFormatContext *pFormatCtx = NULL;
+
+    int videoStream;
+    int audioStream;
+
+    int videoFrameWidth=0;
+
+    int videoFrameHeight=0;
 
     //数据包回调函数
     PacketCallback videoCallback = NULL;
     PacketCallback audioCallback = NULL;
 
-    int videoStream;
-    int audioStream;
-
-    AVFormatContext *pFormatCtx = NULL;
-
-    //是否取流
-    bool isTake = false;
-
-    //编码类型
-    AVCodecID videoCodecID=AV_CODEC_ID_NONE;
-    AVCodecID audioCodecID=AV_CODEC_ID_NONE;
-
     //回调设置者句柄
     void *handle;
 
+    //编码类型
+    AVCodecID videoCodecID = AV_CODEC_ID_NONE;
+    AVCodecID audioCodecID = AV_CODEC_ID_NONE;
+
     //取流准备是否成功
     bool isPrepareSuccess = false;
+
+    pthread_t tid;
+    /*线程标示符*/
+    pthread_attr_t attr;
 };
 
 #endif //MEDIAAPP_STREAMTAKER_H

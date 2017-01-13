@@ -251,7 +251,7 @@ int AudioPlayer::convertToS16(AVFrame *pFrame, uint8_t **audio_buff, int &data_s
         LOGI("swr_init failed.");
         return -1;
     }
-    LOGI("swr_init success.");
+   // LOGI("swr_init success.");
     // 计算转换后的sample个数 a * b / c
     int dst_nb_samples = av_rescale_rnd(
             swr_get_delay(swr_ctx, pFrame->sample_rate) + pFrame->nb_samples, pFrame->sample_rate,

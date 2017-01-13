@@ -15,6 +15,10 @@ RGBRenderer::RGBRenderer() {
 }
 
 RGBRenderer::~RGBRenderer() {
+    if (rgbBuffer != NULL) {
+        av_free(rgbBuffer);
+        rgbBuffer == NULL;
+    }
     if (nativeWindow != NULL) {
         ANativeWindow_release(nativeWindow);
         nativeWindow = NULL;
@@ -24,15 +28,19 @@ RGBRenderer::~RGBRenderer() {
         pBlackFrame == NULL;
     }
 
+
 }
 
 int RGBRenderer::prepare(ANativeWindow *nativeWindow, int frameWidth, int frameHeight) {
+    LOGI("prepare：frameWidth and frameHeight:%d-%d", frameWidth, frameHeight);
     isPrepareSuccess = false;
     if (nativeWindow == NULL) {
+        LOGI("prepare：nativeWindow is null");
         return -1;
     }
     this->nativeWindow = nativeWindow;
     if (frameWidth <= 0 || frameHeight <= 0) {
+        LOGI("prepare：frameWidth and frameHeight is error:%d-%d", frameWidth, frameHeight);
         return -1;
     }
     this->frameWidth = frameWidth;
@@ -40,33 +48,36 @@ int RGBRenderer::prepare(ANativeWindow *nativeWindow, int frameWidth, int frameH
     // 设置native window的buffer大小,可自动拉伸
     ANativeWindow_setBuffersGeometry(nativeWindow, frameWidth, frameHeight,
                                      WINDOW_FORMAT_RGBA_8888);
-    pBlackFrame = av_frame_alloc();
-    if (pBlackFrame != NULL) {
+    if (pBlackFrame == NULL) {
+        pBlackFrame = av_frame_alloc();
         int numBytes = av_image_get_buffer_size(AV_PIX_FMT_RGBA, frameWidth, frameHeight, 1);
-        uint8_t *buffer = (uint8_t *) av_malloc(numBytes * sizeof(uint8_t));
-        av_image_fill_arrays(pBlackFrame->data, pBlackFrame->linesize, buffer, AV_PIX_FMT_RGBA,
+        rgbBuffer = (uint8_t *) av_malloc(numBytes * sizeof(uint8_t));
+        av_image_fill_arrays(pBlackFrame->data, pBlackFrame->linesize, rgbBuffer, AV_PIX_FMT_RGBA,
                              frameWidth, frameHeight, 1);
     }
-
     isPrepareSuccess = true;
+    LOGI("prepare success");
     return 1;
 }
 
-void RGBRenderer::render(AVFrame *pFrameRGBA) {
+int RGBRenderer::render(AVFrame *pFrameRGBA) {
     if (pFrameRGBA == NULL) {
-        return;
+        return -1;
     }
-    render(pFrameRGBA->data[0], pFrameRGBA->linesize[0]);
+    return render(pFrameRGBA->data[0], pFrameRGBA->linesize[0]);
 }
 
-void RGBRenderer::render(uint8_t *data, int size) {
-    LOGI("render:size=%d", size);
+int RGBRenderer::render(uint8_t *data, int size) {
+
     if (isPrepareSuccess == false) {
-        return;
+        LOGI("render：prepare do not success");
+        return -1;
     }
     if (data == NULL || size <= 0) {
-        return;
+        LOGI("render：data or size is empty");
+        return -1;
     }
+
     // lock native window buffer
     ANativeWindow_lock(nativeWindow, &windowBuffer, 0);
 
@@ -83,22 +94,30 @@ void RGBRenderer::render(uint8_t *data, int size) {
     }
 
     ANativeWindow_unlockAndPost(nativeWindow);
+    LOGI("render success");
+    return 1;
 }
 
 bool RGBRenderer::isPreparedSuccess() {
     return isPrepareSuccess;
 }
 
-
 void RGBRenderer::clearScreen() {
-    if (isPrepareSuccess == false) {
-        return;
-    }
-    if (pBlackFrame == NULL) {
-        return;
-    }
+    render(pBlackFrame);
     render(pBlackFrame);
 }
+
+void RGBRenderer::reset() {
+    isPrepareSuccess = false;
+    frameWidth = 0;
+    frameHeight = 0;
+}
+
+
+
+
+
+
 
 
 

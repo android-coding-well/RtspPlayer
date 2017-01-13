@@ -17,6 +17,7 @@ import android.view.SurfaceView;
 import java.io.File;
 
 /**
+ * 此播放器采用RGB渲染
  * Created by hwj on 2016/11/17.
  */
 
