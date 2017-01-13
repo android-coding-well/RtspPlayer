@@ -5,13 +5,15 @@
 ##环境
 * Windows 10
 * 基于FFmpeg3.2.2(ndk-r10e编译)
-* Android Studio 2.2.3
+* AndroidStudio2.2.3
 ---
-* 至于编译FFMPEG的细节详看：
+ 至于编译FFMPEG的细节详看：
 ### [windows10下编译ffmpeg for android](http://blog.csdn.net/huweijian5/article/details/52840177)
-* 在androidstudio上使用的细节详看：
+
+ 在androidstudio上使用的细节详看：
 ### [在androidstudio2.2上使用ffmpeg动态库](http://blog.csdn.net/huweijian5/article/details/52883969)
-* 搭建简单的测试服务
+
+ 搭建简单的测试服务
 ### [利用live555搭建最简单的流媒体服务](http://blog.csdn.net/huweijian5/article/details/53928521)
 ---
 ![一路视频](https://github.com/huweijian5/RtspPlayer/blob/master/screenshots/snapshot1.png)
