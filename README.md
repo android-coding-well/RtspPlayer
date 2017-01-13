@@ -1,4 +1,3 @@
-
 # 实时流媒体播放器RtspPlayer
 
 一款基于FFmpeg的支持多路的实时流媒体播放器
@@ -7,6 +6,7 @@
 * Windows 10
 * 基于FFmpeg3.2.2(ndk-r10e编译)
 * AndroidStudio2.2.3
+
 ---
  至于编译FFMPEG的细节详看：
 ### [windows10下编译ffmpeg for android](http://blog.csdn.net/huweijian5/article/details/52840177)
