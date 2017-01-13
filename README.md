@@ -16,6 +16,10 @@
 
  搭建简单的测试服务
 ### [利用live555搭建最简单的流媒体服务](http://blog.csdn.net/huweijian5/article/details/53928521)
+
+音视频相关知识
+### [音视频相关知识记录](http://blog.csdn.net/huweijian5/article/details/54099197)
+
 ---
 ![一路视频](https://github.com/huweijian5/RtspPlayer/blob/master/screenshots/snapshot1.png)
 
