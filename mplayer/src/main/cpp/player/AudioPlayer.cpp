@@ -140,10 +140,10 @@ int AudioPlayer::createBufferQueueAudioPlayer(int rate, int channel) {
         return -1;
     }
 
-    // register callback on the buffer queue
+    // register IVideoCallback on the buffer queue
     result = (*bqPlayerBufferQueue)->RegisterCallback(bqPlayerBufferQueue, bqPlayerCallback, this);
     if (SL_RESULT_SUCCESS != result) {
-        LOGI("Register callback on the buffer queue failed:errorcode=%d", result);
+        LOGI("Register IVideoCallback on the buffer queue failed:errorcode=%d", result);
         return -1;
     }
 

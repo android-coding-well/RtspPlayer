@@ -31,6 +31,7 @@ StreamTaker::~StreamTaker() {
         avformat_close_input(&pFormatCtx);
         pFormatCtx = NULL;
     }
+    avformat_network_deinit();
 }
 
 void StreamTaker::setVideoPacketCallback(void *handle, PacketCallback callback) {
@@ -46,6 +47,8 @@ void StreamTaker::setAudioPacketCallback(void *handle, PacketCallback callback) 
 int StreamTaker::prepare(const char *url) {
    // LOGI("prepare" );
     isPrepareSuccess = false;
+    hasReceiveVideoPacketCount=0;
+    hasReceiveAudioPacketCount=0;
     if (url == NULL || strcmp(url, "") == 0) {
         return PARAMS_ERROR;
     }
@@ -99,7 +102,7 @@ int StreamTaker::prepare(const char *url) {
 
     if (audioStream == -1) {
         LOGI("Didn't find a audio stream.");
-        // return FIND_VIDEO_STREAM_FAILED;
+         //return FIND_VIDEO_STREAM_FAILED;
     } else {
         LOGI("Find a audio stream success:%d", audioStream);
         audioCodecID = pFormatCtx->streams[audioStream]->codecpar->codec_id;
@@ -148,12 +151,14 @@ void StreamTaker::takingStream() {
         if (packet.stream_index == videoStream && isTake) {
             if (videoCallback != NULL && isTake) {
                 LOGI("取到视频流");
+                hasReceiveVideoPacketCount++;
                 videoCallback(handle, packet);
             }
         }
         if (packet.stream_index == audioStream && isTake) {
             if (audioCallback != NULL && isTake) {
                 LOGI("取到音频流");
+                hasReceiveAudioPacketCount++;
                 audioCallback(handle, packet);
             }
         }
@@ -170,7 +175,13 @@ int StreamTaker::getFrameHeight() {
     return videoFrameHeight;
 }
 
+int StreamTaker::getReceiveVideoPacketCount() {
+    return hasReceiveVideoPacketCount;
+}
 
+int StreamTaker::getReceiveAudioPacketCount() {
+    return hasReceiveAudioPacketCount;
+}
 
 
 

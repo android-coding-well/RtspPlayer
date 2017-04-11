@@ -22,14 +22,11 @@ public :
 
     ~StreamTaker();
 
-    //设置原始视频数据包回调函数
+    //设置原始数据包回调函数
     //handle 回调设置者句柄
-    //callback 回调函数
+    //IVideoCallback 回调函数
     void setVideoPacketCallback(void *handle, PacketCallback callback);
 
-    //设置原始音频数据包回调函数
-    //handle 回调设置者句柄
-    //callback 回调函数
     void setAudioPacketCallback(void *handle, PacketCallback callback);
 
     //取流准备
@@ -58,7 +55,15 @@ public :
     //获得原始视频帧的高度，在prepare后才有效
     int getFrameHeight();
 
+    int getReceiveVideoPacketCount();
+
+    int getReceiveAudioPacketCount();
+
 private :
+    //已经接收到的流的个数
+    int hasReceiveVideoPacketCount=0;
+    int hasReceiveAudioPacketCount=0;
+
 
     //是否取流
     bool isTake = false;

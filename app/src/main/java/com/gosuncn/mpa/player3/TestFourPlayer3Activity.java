@@ -66,9 +66,9 @@ public class TestFourPlayer3Activity extends AppCompatActivity {
             }
         });
 
-        binding.rpPLayer1.startPlay("rtsp://192.168.16.135/video/264/tc10.264");
-        binding.rpPLayer2.startPlay("rtsp://192.168.16.135/video/264/test.mkv");
-        binding.rpPLayer3.startPlay("rtsp://192.168.16.135/video/264/test.264");
-        binding.rpPLayer4.startPlay("rtsp://192.168.15.64/m1.avi");
+        binding.rpPLayer1.startPlay("rtsp://192.168.39.19/video/264/tc10.264");
+        binding.rpPLayer2.startPlay("rtsp://192.168.39.19/video/264/test.mkv");
+        binding.rpPLayer3.startPlay("rtsp://192.168.39.19/video/264/test.264");
+        binding.rpPLayer4.startPlay("rtsp://192.168.39.19/video/265/surfing.265");
     }
 }

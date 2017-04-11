@@ -1,6 +1,7 @@
 package com.gosuncn.mplay;
 
 /**
+ * 对接streamhandler-lib.cpp
  * 服务于RtspPlayer3
  * Created by hwj on 2016/10/18.
  */

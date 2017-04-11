@@ -19,9 +19,6 @@ import java.util.Date;
 
 public class TestPlayer1Activity extends AppCompatActivity {
 
-    //rtsp://1:1@192.168.15.65:554/xms/realplay/44011201/8/35?streams=0
-    //rtsp://1:1@192.168.28.17:554/xms/realplay/44011201/8/35?streams=0
-    //rtsp://192.168.28.29:8554/2.264
     //rtsp://218.204.223.237:554/live/1/66251FC11353191F/e7ooqwcfbqjoo80j.sdp
     private static final String TAG = "TestPlayer1Activity";
     ActivityTestPlayer1Binding binding;
@@ -33,7 +30,7 @@ public class TestPlayer1Activity extends AppCompatActivity {
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_test_player1);
 
-        binding.etRtspUrl.setText("rtsp://192.168.16.135/video/264/tc10.264");
+        binding.etRtspUrl.setText("rtsp://192.168.39.19/video/264/tc10.264");
         binding.etRtspUrl2.setText(Environment.getExternalStorageDirectory().toString() + "/test.mp4");
 
         binding.rpVideo.setOnRtspPlayResultListener(new RtspPlayer.OnRtspPlayResultListener() {

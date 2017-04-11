@@ -6,7 +6,7 @@ bugly {
 }
 android {
     compileSdkVersion 24
-    buildToolsVersion "24.0.0"
+    buildToolsVersion '25.0.0'
 
     defaultConfig {
         minSdkVersion 18
@@ -17,8 +17,8 @@ android {
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         externalNativeBuild {
             cmake {
-                cppFlags "-frtti -fexceptions"
-                arguments '-DANDROID_TOOLCHAIN=clang','-DANDROID_STL=gnustl_static'
+                cppFlags "-frtti -fexceptions -Wno-error=format-security"
+                arguments '-DANDROID_PLATFORM=android-21','-DANDROID_TOOLCHAIN=clang','-DANDROID_STL=gnustl_static'
             }
         }
 
@@ -53,6 +53,5 @@ dependencies {
     })
     compile 'com.android.support:appcompat-v7:24.2.1'
     testCompile 'junit:junit:4.12'
-    compile 'com.tencent.bugly:crashreport:latest.release' //其中latest.release指代最新版本号，也可以指定明确的版本号，例如2.1.5
-    compile 'com.tencent.bugly:nativecrashreport:latest.release' //其中latest.release指代最新版本号，也可以指定明确的版本号，例如2.2.0
+
 }

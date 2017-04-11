@@ -15,11 +15,6 @@ Convertor::~Convertor() {
         av_frame_free(&pFrameRGBA);
         pFrameRGBA=NULL;
     }
-    if(rgbBuffer!=NULL){
-        av_free(rgbBuffer);
-        rgbBuffer=NULL;
-    }
-
 }
 
 AVFrame * Convertor::YUV2RGB(AVFrame *pFrame) {
@@ -30,7 +25,7 @@ AVFrame * Convertor::YUV2RGB(uint8_t * * data,int size[]) {
     if (data == NULL||size==NULL) {
         return NULL;
     }
-    if (isPrepareYUV2RGBSuccess == false) {
+    if (isPrepareYUVToRGBSuccess == false) {
         return NULL;
     }
     // 格式转换
@@ -41,9 +36,9 @@ AVFrame * Convertor::YUV2RGB(uint8_t * * data,int size[]) {
     return pFrameRGBA;
 }
 
-int Convertor::prepareYUV2RGB(int frameWidth, int frameHeight, AVPixelFormat pix_fmt) {
-    isPrepareYUV2RGBSuccess=false;
-    if (frameWidth <= 0 || frameHeight <= 0 || pix_fmt == -1) {
+int Convertor::prepareYUVToRGB(int frameWidth, int frameHeight, AVPixelFormat yuvFormat,AVPixelFormat rgbFormat) {
+    isPrepareYUVToRGBSuccess=false;
+    if (frameWidth <= 0 || frameHeight <= 0 || yuvFormat == -1||rgbFormat==-1) {
         LOGI("Params is error,please check again.");
         return -1;
     }
@@ -57,40 +52,44 @@ int Convertor::prepareYUV2RGB(int frameWidth, int frameHeight, AVPixelFormat pix
     this->frameHeight = frameHeight;
 
     // Determine required buffer size and allocate buffer
-    // rgbBuffer中数据就是用于渲染的,且格式为RGBA
-    int numBytes = av_image_get_buffer_size(AV_PIX_FMT_RGBA,  frameWidth, frameHeight,1);
+    // buffer中数据就是用于渲染的
+    int numBytes = av_image_get_buffer_size(rgbFormat,  frameWidth, frameHeight,1);
     LOGI("av_image_get_buffer_size=%d",numBytes);
-    rgbBuffer = (uint8_t *) av_malloc(numBytes * sizeof(uint8_t));
-    if(rgbBuffer==NULL){
-        LOGI("av_malloc buffer failed,please try again");
+    uint8_t *buffer = (uint8_t *) av_malloc(numBytes * sizeof(uint8_t));
+    if(buffer==NULL){
+        LOGI("Could not allocate buffer.");
         return -1;
     }
-    if(av_image_fill_arrays( pFrameRGBA->data,  pFrameRGBA->linesize, rgbBuffer, AV_PIX_FMT_RGBA,
+    if(av_image_fill_arrays( pFrameRGBA->data,  pFrameRGBA->linesize, buffer, rgbFormat,
                           frameWidth, frameHeight, 1)<0){
-        LOGI("av_image_fill_arrays failed");
         return -1;
     };
     sws_ctx = sws_getContext(frameWidth,
                              frameHeight,
-                             pix_fmt,
+                             yuvFormat,
                              frameWidth,
                              frameHeight,
-                             AV_PIX_FMT_RGBA,
+                             rgbFormat,
                              SWS_BILINEAR,
                              NULL,
                              NULL,
                              NULL);
     if(sws_ctx==NULL){
-        LOGI("sws_getContext failed");
         return -1;
     }
-    LOGI("prepareYUV2RGB success");
-    isPrepareYUV2RGBSuccess=true;
+    isPrepareYUVToRGBSuccess=true;
     return 1;
 }
 
-bool Convertor::isPreparedYUV2RGBSuccess() {
-    return isPrepareYUV2RGBSuccess;
+int Convertor::prepareYUVToRGBA(int frameWidth, int frameHeight, AVPixelFormat yuvFormat){
+    return prepareYUVToRGB(frameWidth,frameHeight,yuvFormat,AV_PIX_FMT_RGBA);
+}
+int Convertor::prepareYUVToRGB565LE(int frameWidth, int frameHeight, AVPixelFormat yuvFormat){
+    return prepareYUVToRGB(frameWidth,frameHeight,yuvFormat,AV_PIX_FMT_RGB565LE);
+}
+
+bool Convertor::isPreparedYUVToRGBSuccess() {
+    return isPrepareYUVToRGBSuccess;
 }
 
 int Convertor::audioToS16(AVFrame *pFrame, uint8_t **audioBuffer, int &dataSize) {

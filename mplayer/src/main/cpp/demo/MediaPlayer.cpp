@@ -105,12 +105,12 @@ void videoPacketCallback2(void *handle, AVPacket packet) {
             LOGI("videoPacketCallback5");
             player->frameWidth = pFrame->width;
             player->frameHeight = pFrame->height;
-            if (!player->convertor.isPreparedYUV2RGBSuccess()) {
-                player->convertor.prepareYUV2RGB(pFrame->width, pFrame->height,
+            if (!player->convertor.isPreparedYUVToRGBSuccess()) {
+                player->convertor.prepareYUVToRGBA(pFrame->width, pFrame->height,
                                                  player->videoCodec.getAVCodecContext()->pix_fmt);
             }
             if (!player->rgbRenderer.isPreparedSuccess()) {
-                player->rgbRenderer.prepare(player->getANativeWindow(), pFrame->width,
+                player->rgbRenderer.prepareRGBA(player->getANativeWindow(), pFrame->width,
                                             pFrame->height);
             }
             if (player->isVideoPlaying()) {

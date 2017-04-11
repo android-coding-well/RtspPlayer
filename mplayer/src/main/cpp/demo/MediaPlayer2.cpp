@@ -67,7 +67,7 @@ void MediaPlayer2::close() {
 void videoPacketCallback3(void *handle, AVPacket packet) {
     LOGI("videoPacketCallback3");
     MediaPlayer2 *player = (MediaPlayer2 *) handle;
-    player->rtspPlayer.addUndecodeVideoData(packet.data,packet.size);
+    player->rgbHandler.addUndecodeVideoData(packet.data,packet.size);
 }
 
 
@@ -75,7 +75,7 @@ void videoPacketCallback3(void *handle, AVPacket packet) {
 void audioPacketCallback2(void *handle, AVPacket packet) {
     LOGI("audioPacketCallback2");
     MediaPlayer2 *player = (MediaPlayer2 *) handle;
-    player->rtspPlayer.addUndecodeAudioData(packet);
+    player->rgbHandler.addUndecodeAudioData(packet);
     //player->rtspPlayer.addUndecodeAudioData(packet.data,packet.size);
 }
 
@@ -84,62 +84,62 @@ void audioPacketCallback2(void *handle, AVPacket packet) {
  */
 int MediaPlayer2::prepare(const char *url) {
     stopPlay2(true);
-    rtspPlayer.reset();
+    rgbHandler.reset();
     int ret = streamTaker.prepare(url);
     if (ret != SUCCESS) {
        return ret;
     }
     streamTaker.setVideoPacketCallback(this, videoPacketCallback3);
     streamTaker.setAudioPacketCallback(this, audioPacketCallback2);
-    rtspPlayer.setVideoFrameSize(streamTaker.getFrameWidth(),streamTaker.getFrameHeight());
+    rgbHandler.setVideoFrameSize(streamTaker.getFrameWidth(),streamTaker.getFrameHeight());
 
-    rtspPlayer.setVideoDecodecID(streamTaker.getVideoCodeID());
-    rtspPlayer.setAudioDecodecID(streamTaker.getAudioCodeID());
+    rgbHandler.setVideoDecodecID(streamTaker.getVideoCodeID());
+    rgbHandler.setAudioDecodecID(streamTaker.getAudioCodeID());
     return SUCCESS;
 }
 
 void MediaPlayer2::startPlay() {
     LOGI("%d startPlay", this);
-    rtspPlayer.clearVideoDecodeQueue();
+    rgbHandler.clearVideoQueue();
     streamTaker.startTakeStream();
-    rtspPlayer.startPlay();
+    rgbHandler.startPlay();
 
 }
 
 void MediaPlayer2::stopPlay2() {
     LOGI("%d stopPlay2", this);
     streamTaker.stopTakeStream();
-    rtspPlayer.stopPlay();
+    rgbHandler.stopPlay();
 }
 void MediaPlayer2::stopPlay2(bool keepSoundStatus) {
     LOGI("%d stopPlay2:%d", this,keepSoundStatus);
     streamTaker.stopTakeStream();
-    rtspPlayer.stopPlay(keepSoundStatus);
+    rgbHandler.stopPlay(keepSoundStatus);
 }
 
 int MediaPlayer2::capture(const char *savePath) {
-    return rtspPlayer.capture(savePath);
+    return rgbHandler.capture(savePath);
 }
 
 void MediaPlayer2::soundOn() {
-    rtspPlayer.clearAudioDecodeQueue();
-    rtspPlayer.soundOn();
+    rgbHandler.clearAudioDecodeQueue();
+    rgbHandler.soundOn();
 }
 
 void MediaPlayer2::soundOff() {
-    rtspPlayer.soundOff();
+    rgbHandler.soundOff();
 }
 
 bool MediaPlayer2::isVideoPlaying() {
-    return rtspPlayer.isVideoPlaying();
+    return rgbHandler.isVideoPlaying();
 }
 
 bool MediaPlayer2::isAudioSoundOn() {
-    return rtspPlayer.isAudioSoundOn();
+    return rgbHandler.isAudioSoundOn();
 }
 
 void MediaPlayer2::setANativeWindow(ANativeWindow *nativeWindow) {
-    rtspPlayer.setANativeWindow(nativeWindow);
+    rgbHandler.setANativeWindow(nativeWindow);
 }
 
 

@@ -8,12 +8,11 @@
 
 #include <string>
 #include <hash_map>
-
 using namespace std;
-enum RetCodeEnum {
-    FAILED = -1,
-    UNKNOW = 999,
-    SUCCESS = 1,
+enum RetCodeEnum{
+    FAILED=-1,
+    UNKNOW=999,
+    SUCCESS=1,
     OPEN_FILE_FAILED,
     FIND_STREAM_INFORMATION_FAILED,
     FIND_VIDEO_STREAM_FAILED,
@@ -26,13 +25,10 @@ enum RetCodeEnum {
     CAPTURE_ERROR_IN_FILE
 
 };
-
-class RetCode {
+class RetCode{
 public :
-    RetCode();
-
-    // 根据错误码获得错误信息
-    string getMessageByCode(int code);
+     RetCode();
+     string getMessageByCode(int code);
 
 private :
     __gnu_cxx::hash_map<int, string> map;

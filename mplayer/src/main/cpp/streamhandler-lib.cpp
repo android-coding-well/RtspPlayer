@@ -148,7 +148,7 @@ Java_com_gosuncn_mplay_PlayerJNI3_getRenderCount(JNIEnv *env, jobject instance, 
     if (mPlayer == NULL) {
         return -1;
     }
-    return mPlayer->rtspPlayer.renderFrameCount;
+    return mPlayer->rgbHandler.renderFrameCount;
 }
 JNIEXPORT jint JNICALL
 Java_com_gosuncn_mplay_PlayerJNI3_getReceiveVideoCount(JNIEnv *env, jobject instance, jint handle
@@ -158,7 +158,7 @@ Java_com_gosuncn_mplay_PlayerJNI3_getReceiveVideoCount(JNIEnv *env, jobject inst
     if (mPlayer == NULL) {
         return -1;
     }
-    return mPlayer->rtspPlayer.receiveVideoPacketCount;
+    return mPlayer->rgbHandler.receiveVideoPacketCount;
 }
 JNIEXPORT jint JNICALL
 Java_com_gosuncn_mplay_PlayerJNI3_getDecodeVideoCount(JNIEnv *env, jobject instance, jint handle
@@ -168,7 +168,7 @@ Java_com_gosuncn_mplay_PlayerJNI3_getDecodeVideoCount(JNIEnv *env, jobject insta
     if (mPlayer == NULL) {
         return -1;
     }
-    return mPlayer->rtspPlayer.decodeVideoFrameCount;
+    return mPlayer->rgbHandler.decodeVideoFrameCount;
 }
 JNIEXPORT jint JNICALL
 Java_com_gosuncn_mplay_PlayerJNI3_getDecodeFailedVideoCount(JNIEnv *env, jobject instance, jint handle
@@ -178,7 +178,7 @@ Java_com_gosuncn_mplay_PlayerJNI3_getDecodeFailedVideoCount(JNIEnv *env, jobject
     if (mPlayer == NULL) {
         return -1;
     }
-    return mPlayer->rtspPlayer.decodeFailedVideoFrameCount;
+    return mPlayer->rgbHandler.decodeFailedVideoFrameCount;
 }
 JNIEXPORT jint JNICALL
 Java_com_gosuncn_mplay_PlayerJNI3_getReceiveAudioCount(JNIEnv *env, jobject instance, jint handle
@@ -188,7 +188,7 @@ Java_com_gosuncn_mplay_PlayerJNI3_getReceiveAudioCount(JNIEnv *env, jobject inst
     if (mPlayer == NULL) {
         return -1;
     }
-    return mPlayer->rtspPlayer.receiveAudioPacketCount;
+    return mPlayer->rgbHandler.receiveAudioPacketCount;
 }
 JNIEXPORT jint JNICALL
 Java_com_gosuncn_mplay_PlayerJNI3_getDecodeAudioCount(JNIEnv *env, jobject instance, jint handle
@@ -198,7 +198,7 @@ Java_com_gosuncn_mplay_PlayerJNI3_getDecodeAudioCount(JNIEnv *env, jobject insta
     if (mPlayer == NULL) {
         return -1;
     }
-    return mPlayer->rtspPlayer.decodeAudioFrameCount;
+    return mPlayer->rgbHandler.decodeAudioFrameCount;
 }
 
 JNIEXPORT jint JNICALL
@@ -209,7 +209,7 @@ Java_com_gosuncn_mplay_PlayerJNI3_getPlayAudioCount(JNIEnv *env, jobject instanc
     if (mPlayer == NULL) {
         return -1;
     }
-    return mPlayer->rtspPlayer.playAudioCount;
+    return mPlayer->rgbHandler.playAudioCount;
 }
 
 JNIEXPORT jint JNICALL
@@ -220,7 +220,7 @@ Java_com_gosuncn_mplay_PlayerJNI3_getDecodeFailedAudioCount(JNIEnv *env, jobject
     if (mPlayer == NULL) {
         return -1;
     }
-    return mPlayer->rtspPlayer.decodeFailedAudioFrameCount;
+    return mPlayer->rgbHandler.decodeFailedAudioFrameCount;
 }
 
 

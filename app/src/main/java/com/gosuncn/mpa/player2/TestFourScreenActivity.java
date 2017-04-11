@@ -67,10 +67,10 @@ public class TestFourScreenActivity extends AppCompatActivity {
             }
         });
 
-        binding.rpPLayer1.startPlay("rtsp://192.168.28.17/2.264");
-        binding.rpPLayer2.startPlay("rtsp://192.168.28.17/2.264");
-        binding.rpPLayer3.startPlay("rtsp://192.168.28.17/2.264");
-        binding.rpPLayer4.startPlay("rtsp://192.168.28.17/2.264");
+        binding.rpPLayer1.startPlay("rtsp://192.168.39.19/2.264");
+        binding.rpPLayer2.startPlay("rtsp://192.168.39.19/2.264");
+        binding.rpPLayer3.startPlay("rtsp://192.168.39.19/2.264");
+        binding.rpPLayer4.startPlay("rtsp://192.168.39.19/2.264");
     }
 
     @Override

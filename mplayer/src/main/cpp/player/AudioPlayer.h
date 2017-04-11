@@ -18,6 +18,7 @@ extern "C" {
 #include "libswresample/swresample.h"
 };
 
+
 class AudioPlayer {
 public :
     AudioPlayer();
@@ -25,7 +26,7 @@ public :
     ~AudioPlayer();
 
     //设置回调
-    //callback：每当缓冲音频播放完毕后会回调此函数（可在此函数里实现更新缓冲音频）
+    //IVideoCallback：每当缓冲音频播放完毕后会回调此函数（可在此函数里实现更新缓冲音频）
     //context：句柄
     void setCallback(slAndroidSimpleBufferQueueCallback callback, void *context);
 

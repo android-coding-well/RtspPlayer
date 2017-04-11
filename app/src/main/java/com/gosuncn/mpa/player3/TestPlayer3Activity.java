@@ -32,9 +32,9 @@ public class TestPlayer3Activity extends AppCompatActivity {
 
         //binding.etRtspUrl.setText("rtsp://192.168.16.135/video/264/tc10.264");
        // binding.etRtspUrl.setText(Environment.getExternalStorageDirectory().toString() + "/test.mp4");
-        binding.etRtspUrl.setText("rtsp://192.168.16.135/video/aac/winamp-intro.aac");
-        binding.etRtspUrl.setText("rtsp://192.168.16.135/video/aac/96.mp3");
-        binding.etRtspUrl.setText("rtsp://192.168.16.135/video/264/test.mkv");
+        binding.etRtspUrl.setText("rtsp://192.168.39.19/video/aac/winamp-intro.aac");
+        binding.etRtspUrl.setText("rtsp://192.168.39.19/video/aac/96.mp3");
+        binding.etRtspUrl.setText("rtsp://192.168.39.19/video/265/surfing.265");
        // binding.etRtspUrl.setText("rtsp://192.168.16.135/video/264/test.264");
         //binding.etRtspUrl.setText("rtsp://192.168.15.64/b1.avi");
         //binding.etRtspUrl.setText("rtsp://192.168.15.64/m1.avi");

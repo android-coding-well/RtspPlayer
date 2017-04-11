@@ -26,6 +26,7 @@ YUV420PRenderer::~YUV420PRenderer() {
 }
 
 bool YUV420PRenderer::setup() {
+    LOGI("setup");
     setupYUVTexture();
     loadShader(); //load shader
     glUseProgram(gProgram);
@@ -220,6 +221,5 @@ void YUV420PRenderer::resetWindow(int winWidth, int winHeight) {
     iDrawHeight = winHeight;
 
     glViewport(0, 0, winWidth, winHeight);
-
 
 }

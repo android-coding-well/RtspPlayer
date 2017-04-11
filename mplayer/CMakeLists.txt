@@ -22,7 +22,6 @@ add_library( # Sets the name of the library.
              src/main/cpp/streamhandler-lib.cpp
              src/main/cpp/demo/MediaPlayer.cpp
              src/main/cpp/demo/MediaPlayer2.cpp
-             src/main/cpp/player/RtspPlayer.cpp
              src/main/cpp/player/YUV420PRenderer.cpp
              src/main/cpp/player/RetCode.cpp
              src/main/cpp/player/Codec.cpp
@@ -31,6 +30,10 @@ add_library( # Sets the name of the library.
              src/main/cpp/player/AudioPlayer.cpp
              src/main/cpp/player/Convertor.cpp
              src/main/cpp/player/RGBRenderer.cpp
+             src/main/cpp/player/Optimize.cpp
+             src/main/cpp/player/NativeCodec.cpp
+             src/main/cpp/player/RGBHandler.cpp
+             src/main/cpp/player/YUVHandler.cpp
              )
 
 
@@ -100,6 +103,7 @@ target_link_libraries( # Specifies the target library.
                        android#使用ANativeWindow_fromSurface将surface转化为ANativeWindow,该接口的声明在android/native_window_jni.h中，实现在libandroid.so(位置：ndk-bundle\platforms\android-18\arch-arm\usr\lib)中
                        GLESv2#渲染时使用
                        OpenSLES#音频使用
+                       mediandk#硬解码
 
                        # Links the target library to the log library
                        # included in the NDK.

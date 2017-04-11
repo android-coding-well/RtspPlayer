@@ -79,13 +79,19 @@ class YUV420PRenderer {
 public:
     YUV420PRenderer();
 
-    ~YUV420PRenderer();
+    virtual ~YUV420PRenderer();
 
+    //重置窗口大小,需在渲染视频之前设置
+    //winWidth：窗体宽度（即显示宽度）
+    //winHeght：窗体高度
+    void resetWindow(int winWidth, int winHeight);
 
-    //设置视频帧大小
+    //设置视频帧大小,需在渲染视频之前设置
+    //winWidth：视频帧宽度（即视频源宽度）
+    //winHeght：视频帧高度
     void setFrameSize(int frameWidth, int frameHeight);
 
-    //清除渲染
+    //清除渲染，即黑屏
     void clearFrame();
 
     //渲染旧视频帧
@@ -93,11 +99,6 @@ public:
 
     //渲染新视频帧
     void renderFrame(uint8_t **pixels);
-
-    //重置窗口大小
-    //winWidth  窗体宽度（即显示宽度）
-    //winHeght  窗体高度
-    void resetWindow(int winWidth, int winHeight);
 
 private:
     uint8_t *y_pixels;

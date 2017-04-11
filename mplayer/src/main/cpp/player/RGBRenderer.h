@@ -22,12 +22,20 @@ public :
     //重置参数
     void reset();
 
-    //渲染前准备相关资源
+
+    //渲染前准备相关资源(WINDOW_FORMAT_RGBA_8888)
     //nativeWindow：渲染窗体
     //frameWidth:视频帧宽度（非窗体宽度）
     //frameHeight:视频帧高度（非窗体高度）
     //return 1--success
-    int prepare(ANativeWindow *nativeWindow, int frameWidth, int frameHeight);
+    int prepareRGBA(ANativeWindow *nativeWindow, int frameWidth, int frameHeight);
+
+    //渲染前准备相关资源（WINDOW_FORMAT_RGB_565）
+    //nativeWindow：渲染窗体
+    //frameWidth:视频帧宽度（非窗体宽度）
+    //frameHeight:视频帧高度（非窗体高度）
+    //return 1--success
+    int prepareRGB565(ANativeWindow *nativeWindow, int frameWidth, int frameHeight);
 
     //渲染rgb数据
     //pFrameRGBA:转换后的rgb帧
@@ -48,6 +56,11 @@ public :
 
 private :
 
+    //一个像素点所占用的字节数
+    // WINDOW_FORMAT_RGB_565占用2个字节
+    //WINDOW_FORMAT_RGBA_8888和WINDOW_FORMAT_RGBX_8888占用4个字节
+    int rgbSize;
+
     bool isPrepareSuccess = false;
     ANativeWindow *nativeWindow=NULL;
     ANativeWindow_Buffer windowBuffer;
@@ -57,7 +70,6 @@ private :
 
     //黑屏帧
     AVFrame *pBlackFrame = NULL;
-    uint8_t * rgbBuffer=NULL;
 };
 
 

@@ -31,7 +31,7 @@ AVFrame *Codec::decode(AVPacket packet) {
 
     if (ret = avcodec_send_packet(pCodecCtx, &packet)) {
         av_strerror(ret, msg, len);
-        LOGI("%d send packet failed:%d--%s--%d", this, ret, msg,packet.size);
+        LOGE("%d send packet failed:%d--%s--%d", this, ret, msg,packet.size);
         return NULL;
     }
     int i=0;
@@ -39,7 +39,7 @@ AVFrame *Codec::decode(AVPacket packet) {
     while(ret = avcodec_receive_frame(pCodecCtx, pFrame)!=0){
         i++;
         av_strerror(ret, msg, len);
-        LOGI("%d receive frame failed:%d--%s", this, ret, msg);
+        LOGE("%d receive frame failed:%d--%s", this, ret, msg);
         if(ret!=-11){//直接认为失败，丢弃
            return NULL;
         }else if(i>TRY_COUNT){//第一次收到-11后如果连续TRY_COUNT次还是-11，则直接丢弃
@@ -53,6 +53,7 @@ AVFrame *Codec::decode(AVPacket packet) {
         LOGI("%d the format of frame is %d(details in AVPixelFormat or AVSampleFormat)",this , pFrame->format);
     }*/
     //LOGI("帧类型=%d",pFrame->pict_type);
+    //LOGI("(AVPixelFormat or AVSampleFormat)=%d",pFrame->format);
     return pFrame;
 }
 
@@ -73,11 +74,11 @@ AVPacket *Codec::encode(AVFrame *pFrame) {
         return NULL;
     }
     if (avcodec_send_frame(pCodecCtx, pFrame)) {
-        LOGI("send frame failed");
+        LOGE("send frame failed");
         return NULL;
     }
     if (avcodec_receive_packet(pCodecCtx, packet)) {
-        LOGI("receive packet failed");
+        LOGE("receive packet failed");
         return NULL;
     };
     return packet;
@@ -92,7 +93,7 @@ int Codec::prepareDecode(AVCodecID codecID) {
     LOGI("%d find decoder：name=%s AVCodecID=%d", this, pCodec->name, pCodec->id);
     pCodecCtx = avcodec_alloc_context3(pCodec);
     if (pCodecCtx == NULL) {
-        LOGI("Alloc AVCodecContext failed");
+        LOGE("Alloc AVCodecContext failed");
         return ALLOC_AVCODECCONTEXT_FAILED; // Codec not found
     }
     //pCodecCtx->pix_fmt=AV_PIX_FMT_YUV420P;
@@ -101,7 +102,7 @@ int Codec::prepareDecode(AVCodecID codecID) {
     LOGI("the thread count=%d",pCodecCtx->thread_count);
 
     if (avcodec_open2(pCodecCtx, pCodec, NULL) < 0) {
-        LOGI("Could not open codec.");
+        LOGE("Could not open codec.");
         return OPEN_CODEC_FAILED; // Could not open codec
     }
     LOGI("%d open codec success", this);
@@ -119,13 +120,13 @@ int Codec::prepareEncode(AVCodecID codecID) {
     LOGI("%d find encoder：name=%s AVCodecID=%d", this, pCodec->name, pCodec->id);
     pCodecCtx = avcodec_alloc_context3(pCodec);
     if (pCodecCtx == NULL) {
-        LOGI("Alloc AVCodecContext failed");
+        LOGE("Alloc AVCodecContext failed");
         return ALLOC_AVCODECCONTEXT_FAILED; // Codec not found
     }
     //开启多线程（根据cpu核数）
     pCodecCtx->thread_count=av_cpu_count();
     if (avcodec_open2(pCodecCtx, pCodec, NULL) < 0) {
-        LOGI("Could not open codec.");
+        LOGE("Could not open codec.");
         return OPEN_CODEC_FAILED; // Could not open codec
     }
     LOGI("%d open codec success", this);

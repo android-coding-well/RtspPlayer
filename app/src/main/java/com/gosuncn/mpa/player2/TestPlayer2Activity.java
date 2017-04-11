@@ -26,7 +26,7 @@ public class TestPlayer2Activity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_test_player2);
-        binding.etRtspUrl.setText("rtsp://192.168.16.135/video/264/tc10.264");
+        binding.etRtspUrl.setText("rtsp://192.168.39.19/video/264/tc10.264");
 
         binding.rpVideo.setOnRtspPlayResultListener(new RtspPlayer.OnRtspPlayResultListener() {
             @Override

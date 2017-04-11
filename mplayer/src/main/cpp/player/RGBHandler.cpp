@@ -1,15 +1,15 @@
 #include <unistd.h>
-#include "RtspPlayer.h"
+#include "RGBHandler.h"
 #include "RetCode.h"
 
-#define  LOG_TAG    "RtspPlayer"
+#define  LOG_TAG    "RGBHandler"
 
 /**
  * 渲染线程
  */
 void *renderThread(void *userData) {
-    RtspPlayer *player = (RtspPlayer *) userData;
-    player->render();
+    RGBHandler *player = (RGBHandler *) userData;
+    player->doRenderWork();
     pthread_exit(0);
 }
 
@@ -17,7 +17,7 @@ void *renderThread(void *userData) {
  * 解码视频帧线程
  */
 void *decodeThread(void *userData) {
-    RtspPlayer *player = (RtspPlayer *) userData;
+    RGBHandler *player = (RGBHandler *) userData;
     player->doDecodeWork();
     pthread_exit(0);
 }
@@ -26,7 +26,7 @@ void *decodeThread(void *userData) {
  * 播放音频线程
  */
 void *playAudioThread(void *userData) {
-    RtspPlayer *player = (RtspPlayer *) userData;
+    RGBHandler *player = (RGBHandler *) userData;
     player->doPlayAudioWork();
     pthread_exit(0);
 }
@@ -38,30 +38,30 @@ void *playAudioThread(void *userData) {
 void audioPlayerCallback3(SLAndroidSimpleBufferQueueItf caller,
                           void *pContext) {
     LOGI("audioPlayerCallback3");
-    RtspPlayer *player = (RtspPlayer *) pContext;
+    RGBHandler *player = (RGBHandler *) pContext;
     player->playAudioCount++;
 }
 
 
-RtspPlayer::RtspPlayer() {
+RGBHandler::RGBHandler() {
     //线程初始化
-    pthread_attr_init(&attr); /*初始化,得到默认的属性值*/
-    pthread_attr_init(&attr2); /*初始化,得到默认的属性值*/
-    pthread_attr_init(&attr3); /*初始化,得到默认的属性值*/
+    pthread_attr_init(&renderAttr); /*初始化,得到默认的属性值*/
+    pthread_attr_init(&decodeAttr); /*初始化,得到默认的属性值*/
+    pthread_attr_init(&audioAttr); /*初始化,得到默认的属性值*/
 
     audioPlayer.createEngine();
     audioPlayer.setCallback(audioPlayerCallback3, this);
 }
 
-RtspPlayer::~RtspPlayer() {
-    pthread_attr_destroy(&attr);
-    pthread_attr_destroy(&attr2);
-    pthread_attr_destroy(&attr3);
+RGBHandler::~RGBHandler() {
+    pthread_attr_destroy(&renderAttr);
+    pthread_attr_destroy(&decodeAttr);
+    pthread_attr_destroy(&audioAttr);
     //pthread_exit(0);
     close();
 }
 
-bool RtspPlayer::addHasDecodedVideoData(AVFrame *frame) {
+bool RGBHandler::addHasDecodedVideoData(AVFrame *frame) {
     if (frame != NULL) {
         // LOGI("%d addDecodeVideoData:width=%d,height=%d", this,frame->width, frame->height);
         if (this->frameWidth == 0 || this->frameHeight == 0) {
@@ -69,14 +69,20 @@ bool RtspPlayer::addHasDecodedVideoData(AVFrame *frame) {
         }
         videoDecodeQueue.push_back(frame);
         decodeVideoFrameCount++;
+        if(!rendering&&decodeVideoFrameCount>=optimize.getCacheFrameCount()){
+            rendering=true;
+            startRenderVideoThread();
+        }
+
         return true;
     }
     decodeFailedVideoFrameCount++;
     return false;
 }
 
-bool RtspPlayer::addUndecodeVideoData(unsigned char *data, int dataSize) {
+bool RGBHandler::addUndecodeVideoData(unsigned char *data, int dataSize) {
     if (data != NULL && dataSize > 0) {
+        optimize.receiveFrame();
         AVPacket packet;
         //  av_init_packet(&packet);
         unsigned char *temp = (unsigned char *) malloc(dataSize);
@@ -92,49 +98,65 @@ bool RtspPlayer::addUndecodeVideoData(unsigned char *data, int dataSize) {
     return false;
 }
 
-void RtspPlayer::setANativeWindow(ANativeWindow *nativeWindow) {
+void RGBHandler::setANativeWindow(ANativeWindow *nativeWindow) {
     this->nativeWindow = nativeWindow;
 }
 
 
-ANativeWindow *RtspPlayer::getANativeWindow() {
+ANativeWindow *RGBHandler::getANativeWindow() {
     return this->nativeWindow;
 }
 
-void RtspPlayer::setVideoDecodecID(AVCodecID codecID) {
+void RGBHandler::setVideoDecodecID(AVCodecID codecID) {
     if (codecID != AV_CODEC_ID_NONE) {
         this->videoCodecID = codecID;
         videoCodec.prepareDecode(codecID);
     }
 }
 
-void RtspPlayer::setVideoFrameSize(int frameWidth, int frameHeight) {
+void RGBHandler::setVideoFrameSize(int frameWidth, int frameHeight) {
     if (frameWidth > 0 && frameHeight > 0) {
         this->frameWidth = frameWidth;
         this->frameHeight = frameHeight;
-        rgbRenderer.prepare(nativeWindow, frameWidth, frameHeight);
+        rgbRenderer.prepareRGBA(nativeWindow, frameWidth, frameHeight);
     }
 }
 
 /**
  * 在开始播放前要确保已经设置了ANativeWindow，解码类型，原始视频大小，解码后的数据
  */
-void RtspPlayer::startPlay() {
+void RGBHandler::startPlay() {
     LOGI("startPlay");
     isPlaying = true;
-    //开启渲染线程
-    pthread_create(&tid, &attr, renderThread, this);
-    pthread_create(&tid2, &attr2, decodeThread, this);
+    rendering=false;
+    optimize.reset();
+    //开启解码线程
+    startDecodeVideoThread();
 
 }
 
-void RtspPlayer::stopPlay() {
+void RGBHandler::startDecodeVideoThread(){
+    //开启解码线程
+    pthread_create(&decodeTid, &decodeAttr, decodeThread, this);
+}
+
+void RGBHandler::startRenderVideoThread(){
+    //开启渲染线程
+    pthread_create(&renderTid, &renderAttr, renderThread, this);
+}
+
+bool RGBHandler::isRendering(){
+    return rendering;
+}
+
+
+void RGBHandler::stopPlay() {
     isSoundOn = false;
     isPlaying = false;
     isCapture = false;
 
 }
-void RtspPlayer::stopPlay(boolean keepSoundStatus) {
+void RGBHandler::stopPlay(bool keepSoundStatus) {
     if(!keepSoundStatus){
         isSoundOn = false;
     }
@@ -143,7 +165,7 @@ void RtspPlayer::stopPlay(boolean keepSoundStatus) {
 
 }
 
-void RtspPlayer::doDecodeWork() {
+void RGBHandler::doDecodeWork() {
     while (isPlaying) {
         if (videoUndecodeQueue.size() != 0) {
             AVPacket avPacket = videoUndecodeQueue.front();//get first without deleting
@@ -164,7 +186,7 @@ void RtspPlayer::doDecodeWork() {
     LOGI("doDecodeWork exit ");
 }
 
-void RtspPlayer::doPlayAudioWork() {
+void RGBHandler::doPlayAudioWork() {
     while (isSoundOn) {
         if (audioDecodeQueue.size() > 0) {
             AVFrame *pFrame = audioDecodeQueue.front();
@@ -177,10 +199,9 @@ void RtspPlayer::doPlayAudioWork() {
     }
     LOGI("audio exit");
 }
-
-void RtspPlayer::render() {
+void RGBHandler::doRenderWork() {
     while (isPlaying) {
-        if (videoDecodeQueue.size() != 0) {
+        if (videoDecodeQueue.size() >0) {
             AVFrame *pFrame = videoDecodeQueue.front();//get first without deleting
             videoDecodeQueue.pop_front();//delete first
             if (pFrame == NULL) {
@@ -194,29 +215,35 @@ void RtspPlayer::render() {
             if (isCapture) {
                 saveFrame = pFrame;
             }
-            if (!convertor.isPreparedYUV2RGBSuccess()) {
+            if (!convertor.isPreparedYUVToRGBSuccess()) {
                 LOGI("PreparedYUV2RGB failed,trying again:frameWidth=%d--frameHeight=%d--pix_fmt=%d",
                      frameWidth, frameHeight, videoCodec.getAVCodecContext()->pix_fmt);
-                convertor.prepareYUV2RGB(frameWidth, frameHeight,
+                convertor.prepareYUVToRGBA(frameWidth, frameHeight,
                                          videoCodec.getAVCodecContext()->pix_fmt);
             }
             // LOGI("isPreparedYUV2RGBSuccess");
             if (!rgbRenderer.isPreparedSuccess()) {
                 LOGI("RGBRenderer prepare failed,trying again:frameWidth=%d--frameHeight=%d",
                      frameWidth, frameHeight);
-                rgbRenderer.prepare(getANativeWindow(), frameWidth,
+                rgbRenderer.prepareRGBA(getANativeWindow(), frameWidth,
                                     frameHeight);
             }
             //LOGI("isPreparedSuccess");
             if (isPlaying) {
                 //LOGI("render");
-                if (rgbRenderer.render(convertor.YUV2RGB(pFrame)) == 1) {
+                long pre=clock();
+                AVFrame * frame=convertor.YUV2RGB(pFrame);
+                LOGI("YUV2RGB time=%d us",(clock()-pre));
+                if (rgbRenderer.render(frame) == 1) {
+                    int renderFrameTime=(clock()-pre);
+                    //LOGI("render time=%d",(clock()-pre));
                     renderFrameCount++;
+                    usleep(optimize.getRenderWaitTime(videoDecodeQueue.size(),renderFrameTime));
                 };
             }
         } else {
             //休眠一段时间,避免空转引发CPU100%被占用
-            usleep(10000);
+            usleep(5000);
         }
     }
     rgbRenderer.clearScreen();
@@ -224,21 +251,20 @@ void RtspPlayer::render() {
     LOGI("render exit ");
 }
 
-void RtspPlayer::close() {
+void RGBHandler::close() {
     stopPlay();
-
     if (saveFrame != NULL) {
         av_free(saveFrame);
         saveFrame = NULL;
     }
 }
 
-void RtspPlayer::clearVideoDecodeQueue() {
+void RGBHandler::clearVideoQueue() {
     videoDecodeQueue.clear();
     videoUndecodeQueue.clear();
 }
 
-int RtspPlayer::capture(const char *savePath) {
+int RGBHandler::capture(const char *savePath) {
     if (!isPlaying) {
         LOGI("视频未播放，无法抓拍");
         return CAPTURE_FAILED_WITHOUT_PLAYING;
@@ -272,28 +298,28 @@ int RtspPlayer::capture(const char *savePath) {
 
 }
 
-void RtspPlayer::soundOn() {
+void RGBHandler::soundOn() {
     isSoundOn = true;
     resetAudioCount();
-    pthread_create(&tid3, &attr3, playAudioThread, this);
+    pthread_create(&audioTid, &audioAttr, playAudioThread, this);
 
 }
 
-void RtspPlayer::soundOff() {
+void RGBHandler::soundOff() {
     isSoundOn = false;
     //关闭声音时清除音频队列
     audioDecodeQueue.clear();
 }
 
-bool RtspPlayer::isVideoPlaying() {
+bool RGBHandler::isVideoPlaying() {
     return isPlaying;
 }
 
-bool RtspPlayer::isAudioSoundOn() {
+bool RGBHandler::isAudioSoundOn() {
     return isSoundOn;
 }
 
-void RtspPlayer::setAudioDecodecID(AVCodecID codecID) {
+void RGBHandler::setAudioDecodecID(AVCodecID codecID) {
     if (codecID != AV_CODEC_ID_NONE) {
         this->audioCodecID = codecID;
         // LOGI("setAudioDecodecID=%d",codecID);
@@ -301,7 +327,7 @@ void RtspPlayer::setAudioDecodecID(AVCodecID codecID) {
     }
 }
 
-bool RtspPlayer::addHasDecodedAudioData(AVFrame *frame) {
+bool RGBHandler::addHasDecodedAudioData(AVFrame *frame) {
     //LOGI("addHasDecodedAudioData:%d",frame);
     if (isSoundOn) {
         if(frame != NULL){
@@ -316,7 +342,7 @@ bool RtspPlayer::addHasDecodedAudioData(AVFrame *frame) {
     return false;
 }
 
-bool RtspPlayer::addUndecodeAudioData(AVPacket packet) {
+bool RGBHandler::addUndecodeAudioData(AVPacket packet) {
     if (isSoundOn&&&packet != NULL && audioCodec.isPrepareDecodeSuccess()) {
         receiveAudioPacketCount++;
         addHasDecodedAudioData(audioCodec.decode(packet));
@@ -326,7 +352,7 @@ bool RtspPlayer::addUndecodeAudioData(AVPacket packet) {
     return false;
 }
 
-bool RtspPlayer::addUndecodeAudioData(unsigned char *data, int dataSize) {
+bool RGBHandler::addUndecodeAudioData(unsigned char *data, int dataSize) {
     if (data != NULL && dataSize > 0) {
 
         addHasDecodedAudioData(audioCodec.decode(data, dataSize));
@@ -337,7 +363,7 @@ bool RtspPlayer::addUndecodeAudioData(unsigned char *data, int dataSize) {
     return false;
 }
 
-void RtspPlayer::playingAudio(AVFrame *pFrame) {
+void RGBHandler::playingAudio(AVFrame *pFrame) {
     if (pFrame == NULL) {
         LOGI("audio frame is null");
         return;
@@ -373,23 +399,23 @@ void RtspPlayer::playingAudio(AVFrame *pFrame) {
     av_free(audio_buff);
 }
 
-void RtspPlayer::clearAudioDecodeQueue() {
+void RGBHandler::clearAudioDecodeQueue() {
     audioDecodeQueue.clear();
 }
 
-boolean RtspPlayer::isPrepareVideoDecoderSuccess() {
+bool RGBHandler::isPrepareVideoDecoderSuccess() {
     return videoCodec.isPrepareDecodeSuccess();
 }
 
-boolean RtspPlayer::isPrepareAudioDecoderSuccess() {
+bool RGBHandler::isPrepareAudioDecoderSuccess() {
     return audioCodec.isPrepareDecodeSuccess();
 }
 
-boolean RtspPlayer::isPrepareRGBRenderSuccess() {
+bool RGBHandler::isPrepareRGBRenderSuccess() {
     return rgbRenderer.isPreparedSuccess();
 }
 
-void RtspPlayer::resetVideoCount() {
+void RGBHandler::resetVideoCount() {
     //收到的音视频
     receiveVideoPacketCount = 0;
     //解码的帧数
@@ -402,7 +428,7 @@ void RtspPlayer::resetVideoCount() {
     renderFrameCount = 0;
 }
 
-void RtspPlayer::resetAudioCount() {
+void RGBHandler::resetAudioCount() {
     //收到的音视频
     receiveAudioPacketCount = 0;
     //解码的帧数
@@ -415,7 +441,7 @@ void RtspPlayer::resetAudioCount() {
     playAudioCount = 0;
 }
 
-void RtspPlayer::reset() {
+void RGBHandler::reset() {
     resetVideoCount();
     resetAudioCount();
     videoCodec.reset();
@@ -424,62 +450,3 @@ void RtspPlayer::reset() {
     frameWidth = 0;
     frameHeight = 0;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

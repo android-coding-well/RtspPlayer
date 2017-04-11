@@ -1,5 +1,5 @@
 //
-// rtsp播放器，结合了RtspPlayer使用
+// rtsp播放器，结合了RGBHandler使用
 // Created by hwj on 2016/10/24.
 //
 
@@ -16,7 +16,7 @@
 #include "../player/StreamTaker.h"
 #include "../player/Convertor.h"
 #include "../player/Codec.h"
-#include "../player/RtspPlayer.h"
+#include "../player/RGBHandler.h"
 
 class MediaPlayer2 {
 public :
@@ -93,7 +93,7 @@ public :
     //即将保存的抓图
     // AVFrame *saveFrame = NULL;
 
-    RtspPlayer rtspPlayer;
+    RGBHandler rgbHandler;
 private :
     //ffmpeg锁管理器，防止多路播放崩溃
     static int lockmgr(void **mtx, enum AVLockOp op);

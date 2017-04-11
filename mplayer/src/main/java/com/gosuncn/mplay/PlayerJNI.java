@@ -1,6 +1,7 @@
 package com.gosuncn.mplay;
 
 /**
+ * 对接native-lib.cpp
  * 服务于RtspPlayer和RtspPlayer2
  * Created by hwj on 2016/10/18.
  */
