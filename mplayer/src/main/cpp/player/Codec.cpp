@@ -12,6 +12,10 @@ Codec::Codec() {
     avcodec_register_all();
     pFrame = av_frame_alloc();
     packet = av_packet_alloc();
+
+    sampleRate=DEFAULT_AUDIO_SAMPLE_RATE;
+    channels=DEFAULT_AUDIO_CHANNELS;
+    channelLayout=DEFAULT_AUDIO_CHANNEL_LAYOUT;
 }
 
 Codec::~Codec() {
@@ -27,22 +31,22 @@ AVFrame *Codec::decode(AVPacket packet) {
     int ret = 0;
     char msg[32];
     int len = 32;
-    LOGI("%d send packet :%d--%d",this, packet.data, packet.size);
+    LOGI("%d send packet :%d--%d", this, packet.data, packet.size);
 
     if (ret = avcodec_send_packet(pCodecCtx, &packet)) {
         av_strerror(ret, msg, len);
-        LOGE("%d send packet failed:%d--%s--%d", this, ret, msg,packet.size);
+        LOGE("%d send packet failed:%d--%s--%d", this, ret, msg, packet.size);
         return NULL;
     }
-    int i=0;
-    const int TRY_COUNT=3;
-    while(ret = avcodec_receive_frame(pCodecCtx, pFrame)!=0){
+    int i = 0;
+    const int TRY_COUNT = 3;
+    while (ret = avcodec_receive_frame(pCodecCtx, pFrame) != 0) {
         i++;
         av_strerror(ret, msg, len);
         LOGE("%d receive frame failed:%d--%s", this, ret, msg);
-        if(ret!=-11){//直接认为失败，丢弃
-           return NULL;
-        }else if(i>TRY_COUNT){//第一次收到-11后如果连续TRY_COUNT次还是-11，则直接丢弃
+        if (ret != -11) {//直接认为失败，丢弃
+            return NULL;
+        } else if (i > TRY_COUNT) {//第一次收到-11后如果连续TRY_COUNT次还是-11，则直接丢弃
             return NULL;
         }
     }
@@ -57,13 +61,13 @@ AVFrame *Codec::decode(AVPacket packet) {
     return pFrame;
 }
 
-AVFrame *Codec::decode(unsigned char* data,int dataSize){
-    if(data==NULL||dataSize<=0){
+AVFrame *Codec::decode(unsigned char *data, int dataSize) {
+    if (data == NULL || dataSize <= 0) {
         return NULL;
     }
     AVPacket packet;
-    packet.data=data;
-    packet.size=dataSize;
+    packet.data = data;
+    packet.size = dataSize;
     av_init_packet(&packet);
     return decode(packet);
 }
@@ -86,6 +90,7 @@ AVPacket *Codec::encode(AVFrame *pFrame) {
 
 int Codec::prepareDecode(AVCodecID codecID) {
     isPrepareDecoderSuccess = false;
+
     pCodec = avcodec_find_decoder(codecID);
     if (pCodec == NULL) {
         return FIND_CODEC_FAILED; // Codec not found
@@ -96,10 +101,26 @@ int Codec::prepareDecode(AVCodecID codecID) {
         LOGE("Alloc AVCodecContext failed");
         return ALLOC_AVCODECCONTEXT_FAILED; // Codec not found
     }
+
+    LOGI("%d pCodecCtx params before:sample_rate=%d, channels=%d, bit_rate=%d,channel_layout=%d", this, pCodecCtx->sample_rate,
+         pCodecCtx->channels, pCodecCtx->bit_rate,pCodecCtx->channel_layout);
+
+    if (codecID > 0x15000) {//表示是音频类型,需要设置相关参数，否则可能解码不了
+        LOGI("音频解码,必须设置sample_rate和channels");
+        pCodecCtx->sample_rate =sampleRate;
+        LOGI("channelLayout=%d",channelLayout);
+        //发现 channel_layout即使设置了也无效，仍然会被改为0
+        pCodecCtx->channel_layout = channelLayout;
+        pCodecCtx->channels =channels;
+
+    }
+    LOGI("%d pCodecCtx params after:sample_rate=%d,channels=%d,bit_rate=%d,channel_layout=%d", this, pCodecCtx->sample_rate,
+         pCodecCtx->channels, pCodecCtx->bit_rate,pCodecCtx->channel_layout);
+
     //pCodecCtx->pix_fmt=AV_PIX_FMT_YUV420P;
     //开启多线程（根据cpu核数）
-    pCodecCtx->thread_count=av_cpu_count();
-    LOGI("the thread count=%d",pCodecCtx->thread_count);
+    pCodecCtx->thread_count = av_cpu_count();
+    LOGI("the thread count=%d", pCodecCtx->thread_count);
 
     if (avcodec_open2(pCodecCtx, pCodec, NULL) < 0) {
         LOGE("Could not open codec.");
@@ -124,7 +145,7 @@ int Codec::prepareEncode(AVCodecID codecID) {
         return ALLOC_AVCODECCONTEXT_FAILED; // Codec not found
     }
     //开启多线程（根据cpu核数）
-    pCodecCtx->thread_count=av_cpu_count();
+    pCodecCtx->thread_count = av_cpu_count();
     if (avcodec_open2(pCodecCtx, pCodec, NULL) < 0) {
         LOGE("Could not open codec.");
         return OPEN_CODEC_FAILED; // Could not open codec
@@ -164,9 +185,28 @@ AVCodecContext *Codec::getAVCodecContext() {
 }
 
 void Codec::reset() {
-     isPrepareDecoderSuccess = false;
-     isPrepareEncoderSuccess = false;
+    isPrepareDecoderSuccess = false;
+    isPrepareEncoderSuccess = false;
+     sampleRate=DEFAULT_AUDIO_SAMPLE_RATE;
+     channels=DEFAULT_AUDIO_CHANNELS;
+     channelLayout=DEFAULT_AUDIO_CHANNEL_LAYOUT;
 }
+
+
+void Codec::setAudioCodecParameters(int channels,int channelLayout, int sampleRate) {
+    LOGI("receive channels=%d,channelLayout=%d,sampleRate=%d",channels, channelLayout, sampleRate);
+    if(channels==0){
+        //通道数可以根据通道设计channellayout获得
+        channels=av_get_channel_layout_nb_channels(channelLayout);
+    }
+    this->channels=channels<=0?DEFAULT_AUDIO_CHANNELS:channels;
+    this->channelLayout=channelLayout<=0?DEFAULT_AUDIO_CHANNEL_LAYOUT:channelLayout;
+    this->sampleRate=sampleRate<=0?DEFAULT_AUDIO_SAMPLE_RATE:sampleRate;
+    LOGI("channels=%d,channelLayout=%d,sampleRate=%d", this->channels, this->channelLayout, this->sampleRate);
+
+}
+
+
 
 
 

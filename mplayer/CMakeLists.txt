@@ -40,25 +40,25 @@ add_library( # Sets the name of the library.
 #Add other prebuilt libraries
  add_library(avcodec-lib  SHARED IMPORTED )
  set_target_properties(avcodec-lib PROPERTIES IMPORTED_LOCATION
-                       ${CMAKE_CURRENT_SOURCE_DIR}/src/main/jniLibs/armeabi/libavcodec-57.so )
+                       ${CMAKE_CURRENT_SOURCE_DIR}/src/main/jniLibs/armeabi/libavcodec.so )
  add_library(avdevice-lib  SHARED IMPORTED )
  set_target_properties(avdevice-lib PROPERTIES IMPORTED_LOCATION
-                       ${CMAKE_CURRENT_SOURCE_DIR}/src/main/jniLibs/armeabi/libavdevice-57.so )
+                       ${CMAKE_CURRENT_SOURCE_DIR}/src/main/jniLibs/armeabi/libavdevice.so )
  add_library(avfilter-lib  SHARED IMPORTED )
  set_target_properties(avfilter-lib PROPERTIES IMPORTED_LOCATION
-                       ${CMAKE_CURRENT_SOURCE_DIR}/src/main/jniLibs/armeabi/libavfilter-6.so )
+                       ${CMAKE_CURRENT_SOURCE_DIR}/src/main/jniLibs/armeabi/libavfilter.so )
  add_library(avformat-lib  SHARED IMPORTED )
  set_target_properties(avformat-lib PROPERTIES IMPORTED_LOCATION
-                       ${CMAKE_CURRENT_SOURCE_DIR}/src/main/jniLibs/armeabi/libavformat-57.so )
+                       ${CMAKE_CURRENT_SOURCE_DIR}/src/main/jniLibs/armeabi/libavformat.so )
  add_library(avutil-lib  SHARED IMPORTED )
  set_target_properties(avutil-lib PROPERTIES IMPORTED_LOCATION
-                       ${CMAKE_CURRENT_SOURCE_DIR}/src/main/jniLibs/armeabi/libavutil-55.so )
+                       ${CMAKE_CURRENT_SOURCE_DIR}/src/main/jniLibs/armeabi/libavutil.so )
  add_library(swresample-lib  SHARED IMPORTED )
  set_target_properties(swresample-lib PROPERTIES IMPORTED_LOCATION
-                       ${CMAKE_CURRENT_SOURCE_DIR}/src/main/jniLibs/armeabi/libswresample-2.so )
+                       ${CMAKE_CURRENT_SOURCE_DIR}/src/main/jniLibs/armeabi/libswresample.so )
  add_library(swscale-lib  SHARED IMPORTED )
  set_target_properties(swscale-lib PROPERTIES IMPORTED_LOCATION
-                       ${CMAKE_CURRENT_SOURCE_DIR}/src/main/jniLibs/armeabi/libswscale-4.so )
+                       ${CMAKE_CURRENT_SOURCE_DIR}/src/main/jniLibs/armeabi/libswscale.so )
 
 add_library(jpeg-lib  SHARED IMPORTED )
  set_target_properties(jpeg-lib PROPERTIES IMPORTED_LOCATION

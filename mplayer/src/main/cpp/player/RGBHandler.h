@@ -119,8 +119,14 @@ public :
     //添加未解码的音频帧
     bool addUndecodeAudioData(unsigned char *data, int dataSize);
 
-    //设置音频解码类型
+    //设置音频解码类型，设置之前需要先设置setAudioDecodecParameters
     void setAudioDecodecID(AVCodecID codecID);
+
+    //设置音频解码参数,需要在setAudioDecodecID之前设置，如果未设置则可能导致音频解码失败
+    //channels[in]:通道数
+    //channelLayout[in]:通道格式
+    //sampleRate[in]:采样率
+    void setAudioDecodecParameters(int channels,int channelLayout, int sampleRate);
 
     //打开声音,在打开声音之前请确保已经添加了音频数据
     void soundOn();

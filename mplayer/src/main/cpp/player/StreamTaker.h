@@ -15,6 +15,23 @@ extern "C" {
 #include <pthread.h>
 
 typedef void (*PacketCallback)(void *handle, AVPacket packet);
+typedef struct CodecParameters{
+
+    //视频编码类型
+    int videoCodecId=0;
+    //视频宽高
+    int width=0;
+    int height=0;
+
+    //音频编码类型
+    int audioCodecId=0;
+    //音频通道数
+    int channels=0;
+    //音频通道格式
+    int channelLayout=0;
+    //音频采样率
+    int sampleRate=0;
+}CodecParameters,*PCodecParameters;
 
 class StreamTaker {
 public :
@@ -55,11 +72,33 @@ public :
     //获得原始视频帧的高度，在prepare后才有效
     int getFrameHeight();
 
+    //获得已经接收到的原始视频帧数
     int getReceiveVideoPacketCount();
 
+    //获得已经接收到的原始音频帧数
     int getReceiveAudioPacketCount();
 
+    //获得编解码器参数
+    //通过此参数可以获得视频的编码类型,视频宽高,音频采样率等等
+    CodecParameters * getCodecParameters();
+
+    //获得音频编解码器参数
+    //通过此参数可以获得音频的编码类型，采样率（sample_rate），帧率（bit_rate），通道数（sample_rate），channel_layout等信息
+    AVCodecParameters * getAudioCodecParameters();
+
+    //获得视频编解码器参数
+    AVCodecParameters * getVideoCodecParameters();
+
 private :
+
+    //视频编解码器参数
+    AVCodecParameters * videoCodecParameters=NULL;
+
+    //视频编解码器参数
+    AVCodecParameters * audioCodecParameters=NULL;
+
+    CodecParameters * codecParameters=NULL;
+
     //已经接收到的流的个数
     int hasReceiveVideoPacketCount=0;
     int hasReceiveAudioPacketCount=0;
@@ -74,8 +113,12 @@ private :
     int audioStream;
 
     int videoFrameWidth=0;
-
     int videoFrameHeight=0;
+
+    int audioChannels;
+    int audioChannelLayout;
+    int audioSampleRate;
+    int audioBitRate;
 
     //数据包回调函数
     PacketCallback videoCallback = NULL;

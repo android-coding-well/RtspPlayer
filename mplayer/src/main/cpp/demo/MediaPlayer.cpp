@@ -6,34 +6,13 @@
 
 #include "MediaPlayer.h"
 #include "../player/RetCode.h"
-
+#define  LOG_TAG    "MediaPlayer"
 using namespace std;
 
 
 void audioPlayerCallback(SLAndroidSimpleBufferQueueItf caller,
                          void *pContext) {
     LOGI("audioPlayerCallback");
-    MediaPlayer *player = (MediaPlayer *) pContext;
-    LOGI("audioPlayerCallback:audioQueue size=%d", player->audioQueue.size());
-    if (player->audioQueue.size() > 0) {
-        AVFrame *pFrame = player->audioQueue.front();
-        player->audioQueue.pop_front();
-        AVSampleFormat dst_format = AV_SAMPLE_FMT_S16;//av_get_packed_sample_fmt((AVSampleFormat)frame->format);
-        int64_t dst_layout = av_get_default_channel_layout(pFrame->channels);
-        const int MAX_AUDIO_FRAME_SIZE = 8196;//8196 192000
-        uint8_t *audio_buff;
-        audio_buff = (uint8_t *) malloc(sizeof(uint8_t) * MAX_AUDIO_FRAME_SIZE);//8196
-        int data_size = 0;
-
-        if (!player->audioPlayer.isCreateAudioPlayerSuccess()) {
-            player->audioPlayer.createBufferQueueAudioPlayer(pFrame->sample_rate, pFrame->channels);
-        }
-
-        if (player->convertToS16(pFrame, &audio_buff, data_size) == 1) {
-            player->audioPlayer.enqueue(audio_buff, data_size);
-        };
-    }
-
 }
 
 MediaPlayer::MediaPlayer() {
@@ -124,18 +103,17 @@ void videoPacketCallback2(void *handle, AVPacket packet) {
 
 //音频码流回调
 void audioPacketCallback(void *handle, AVPacket packet) {
-
+    LOGI("audioPacketCallback");
     MediaPlayer *player = (MediaPlayer *) handle;
-    if (player->isVideoPlaying() && player->isAudioSoundOn()) {
+
+    if ( player->isAudioSoundOn()) {
         AVFrame *pFrame = player->audioCodec.decode(packet);
         if (pFrame != NULL) {
-            player->audioQueue.push_back(pFrame);
             //平面格式将不同的声道的数据分开存储，每种数据对应一个data[i]；压缩格式是左右声道交替存储的，
             // 它只占用了AVFrame结构体中的data[0]
             int isPlanar = av_sample_fmt_is_planar((AVSampleFormat) pFrame->format);
             LOGI("音频解码回调:是否平面格式= %d ,sample_fmt_name=%s", isPlanar,
                  av_get_sample_fmt_name((AVSampleFormat) pFrame->format));
-
 
             const int MAX_AUDIO_FRAME_SIZE = 8196;//8196 192000 一般要大于一帧的两倍
             uint8_t *audioBuff;
@@ -147,15 +125,11 @@ void audioPacketCallback(void *handle, AVPacket packet) {
                                                                  pFrame->channels);
             }
 
-            if (player->audioQueue.size() == 1 &&
-                player->convertToS16(pFrame, &audioBuff, dataSize) == 1) {
+            if (player->convertToS16(pFrame, &audioBuff, dataSize) == 1) {
                 player->audioPlayer.enqueue(audioBuff, dataSize);
-                player->audioQueue.pop_front();
             };
 
         }
-    } else {
-        player->audioQueue.clear();
     }
 
 }
@@ -239,15 +213,20 @@ int MediaPlayer::prepare(const char *url) {
     //视频解码准备
     int retCode = videoCodec.prepareDecode(streamTaker.getVideoCodeID());
     if (retCode != SUCCESS) {
-        return retCode;
+        //return retCode;
+        LOGE("video prepareDecode failed");
     }
     //音频解码准备
     int retCode2 = audioCodec.prepareDecode(streamTaker.getAudioCodeID());
     if (retCode2 != SUCCESS) {
         // return retCode;
-        LOGI("audio prepareDecode failed");
-    } else {
+        LOGE("audio prepareDecode failed");
     }
+
+    if(retCode!= SUCCESS&&retCode2 != SUCCESS){
+        return FAILED;
+    }
+
 
     return SUCCESS;
 }

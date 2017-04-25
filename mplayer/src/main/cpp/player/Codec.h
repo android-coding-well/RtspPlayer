@@ -30,6 +30,15 @@ public :
     //return 1--success
     int prepareDecode(AVCodecID codecID);
 
+
+    //设置音频参数,如果没有则会采用默认参数，默认参数有可能使得解码失败
+    //需要在prepareDecode之前设置才生效
+    //channels[in]:通道数
+    //channelLayout[in]:通道设计，即单声道，双声道等（默认DEFAULT_AUDIO_CHANNEL_LAYOUT），详见libavutil/channel_layout.h中宏定义，如AV_CH_LAYOUT_STEREO
+    //sampleRate[in]:采样率（默认DEFAULT_AUDIO_SAMPLE_RATE）
+    void setAudioCodecParameters(int channels,int channelLayout,int sampleRate);
+
+
     //编码准备（未测试，请勿使用）
     //codecID 编码id
     //return 1--success
@@ -61,6 +70,7 @@ public :
     AVCodecContext *getAVCodecContext();
 
 private :
+
     AVCodec *pCodec = NULL;
     AVCodecContext *pCodecCtx = NULL;
     AVFrame *pFrame = NULL;
@@ -69,6 +79,19 @@ private :
     //解码准备是否成功，成功才可以进行后续解码
     bool isPrepareDecoderSuccess = false;
     bool isPrepareEncoderSuccess = false;
+
+    //默认的音频通道数
+    int DEFAULT_AUDIO_CHANNELS=2;
+    //默认的音频channel_layout
+    int DEFAULT_AUDIO_CHANNEL_LAYOUT=AV_CH_LAYOUT_STEREO;
+    //默认的音频采样率
+    int DEFAULT_AUDIO_SAMPLE_RATE=44100;
+    //默认的比特率
+    int DEFAULT_AUDIO_BIT_RATE=128000;
+
+    int sampleRate;
+    int channels;
+    int channelLayout;
 
 };
 

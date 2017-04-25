@@ -75,8 +75,8 @@ void videoPacketCallback3(void *handle, AVPacket packet) {
 void audioPacketCallback2(void *handle, AVPacket packet) {
     LOGI("audioPacketCallback2");
     MediaPlayer2 *player = (MediaPlayer2 *) handle;
-    player->rgbHandler.addUndecodeAudioData(packet);
-    //player->rtspPlayer.addUndecodeAudioData(packet.data,packet.size);
+   // player->rgbHandler.addUndecodeAudioData(packet);
+    player->rgbHandler.addUndecodeAudioData(packet.data,packet.size);
 }
 
 /**
@@ -93,8 +93,11 @@ int MediaPlayer2::prepare(const char *url) {
     streamTaker.setAudioPacketCallback(this, audioPacketCallback2);
     rgbHandler.setVideoFrameSize(streamTaker.getFrameWidth(),streamTaker.getFrameHeight());
 
+    rgbHandler.setAudioDecodecParameters(streamTaker.getCodecParameters()->channels,streamTaker.getCodecParameters()->channelLayout
+            ,streamTaker.getCodecParameters()->sampleRate);
     rgbHandler.setVideoDecodecID(streamTaker.getVideoCodeID());
     rgbHandler.setAudioDecodecID(streamTaker.getAudioCodeID());
+
     return SUCCESS;
 }
 

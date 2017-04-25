@@ -23,6 +23,8 @@ StreamTaker::StreamTaker() {
     avformat_network_init();
     //线程初始化
     pthread_attr_init(&attr); /*初始化,得到默认的属性值*/
+
+    codecParameters=new CodecParameters();
 }
 
 StreamTaker::~StreamTaker() {
@@ -86,27 +88,50 @@ int StreamTaker::prepare(const char *url) {
 
     }
     if (videoStream == -1) {
-        LOGI("Didn't find a video stream.");
-        return FIND_VIDEO_STREAM_FAILED;
+        LOGE("Didn't find a video stream.");
+       // return FIND_VIDEO_STREAM_FAILED;
     } else {
         LOGI("Find a video stream success:%d", videoStream);
+
+       videoCodecParameters=pFormatCtx->streams[videoStream]->codecpar;
         // Get a pointer to the codec context for the video stream
-        videoCodecID = pFormatCtx->streams[videoStream]->codecpar->codec_id;
+        videoCodecID = videoCodecParameters->codec_id;
         LOGI("The videoCodecID=%d", videoCodecID);
-        videoFrameWidth= pFormatCtx->streams[videoStream]->codecpar->width;
-        videoFrameHeight= pFormatCtx->streams[videoStream]->codecpar->height;
+        videoFrameWidth= videoCodecParameters->width;
+        videoFrameHeight= videoCodecParameters->height;
         LOGI("Find a video stream success:width=%d,height=%d",
              videoFrameWidth,
              videoFrameHeight);
+        codecParameters->videoCodecId=videoCodecID;
+        codecParameters->width=videoFrameWidth;
+        codecParameters->height=videoFrameHeight;
     }
 
     if (audioStream == -1) {
-        LOGI("Didn't find a audio stream.");
+        LOGE("Didn't find a audio stream.");
          //return FIND_VIDEO_STREAM_FAILED;
     } else {
         LOGI("Find a audio stream success:%d", audioStream);
-        audioCodecID = pFormatCtx->streams[audioStream]->codecpar->codec_id;
+         audioCodecParameters=pFormatCtx->streams[audioStream]->codecpar;
+        audioCodecID =audioCodecParameters->codec_id;
         LOGI("The audioCodecID=%d", audioCodecID);
+        LOGI("The audioBitRate=%d", audioCodecParameters->bit_rate);
+        codecParameters->audioCodecId=audioCodecID;
+        codecParameters->channels=audioCodecParameters->channels;
+        codecParameters->channelLayout=audioCodecParameters->channel_layout;
+        codecParameters->sampleRate=audioCodecParameters->sample_rate;
+
+       /* //此处获取的channels一直为0，无法使用
+        LOGI("codec_type=%d,sample_rate=%d,bit_rate=%d,channels=%d,channel_layout=%d",audioCodecParameters->codec_type,
+             audioCodecParameters->sample_rate,audioCodecParameters->bit_rate,audioCodecParameters->channels,audioCodecParameters->channel_layout);*/
+        LOGI("sample_rate=%d,channels=%d,channel_layout=%d", codecParameters->sampleRate,codecParameters->channels,codecParameters->channelLayout);
+
+    }
+
+    //
+    if(videoStream==-1&&audioStream==-1){
+        LOGE("prepare failed!")
+        return FIND_STREAM_INFORMATION_FAILED;
     }
 
     isPrepareSuccess = true;
@@ -182,6 +207,20 @@ int StreamTaker::getReceiveVideoPacketCount() {
 int StreamTaker::getReceiveAudioPacketCount() {
     return hasReceiveAudioPacketCount;
 }
+
+CodecParameters * StreamTaker::getCodecParameters() {
+    return codecParameters;
+}
+
+AVCodecParameters *StreamTaker::getAudioCodecParameters() {
+    return audioCodecParameters;
+}
+
+AVCodecParameters *StreamTaker::getVideoCodecParameters() {
+    return videoCodecParameters;
+}
+
+
 
 
 

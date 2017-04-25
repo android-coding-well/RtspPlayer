@@ -179,7 +179,7 @@ void RGBHandler::doDecodeWork() {
 
         } else {
             //休眠一段时间,避免空转引发CPU100%被占用
-            usleep(10000);
+            usleep(5000);
         }
     }
     videoUndecodeQueue.clear();
@@ -322,7 +322,7 @@ bool RGBHandler::isAudioSoundOn() {
 void RGBHandler::setAudioDecodecID(AVCodecID codecID) {
     if (codecID != AV_CODEC_ID_NONE) {
         this->audioCodecID = codecID;
-        // LOGI("setAudioDecodecID=%d",codecID);
+         LOGI("setAudioDecodecID=%d",codecID);
         audioCodec.prepareDecode(codecID);
     }
 }
@@ -343,6 +343,7 @@ bool RGBHandler::addHasDecodedAudioData(AVFrame *frame) {
 }
 
 bool RGBHandler::addUndecodeAudioData(AVPacket packet) {
+
     if (isSoundOn&&&packet != NULL && audioCodec.isPrepareDecodeSuccess()) {
         receiveAudioPacketCount++;
         addHasDecodedAudioData(audioCodec.decode(packet));
@@ -353,9 +354,15 @@ bool RGBHandler::addUndecodeAudioData(AVPacket packet) {
 }
 
 bool RGBHandler::addUndecodeAudioData(unsigned char *data, int dataSize) {
-    if (data != NULL && dataSize > 0) {
 
-        addHasDecodedAudioData(audioCodec.decode(data, dataSize));
+    if (isSoundOn && audioCodec.isPrepareDecodeSuccess()&&data != NULL && dataSize > 0) {
+        AVPacket packet;
+        //av_init_packet(&packet);
+        unsigned char *temp = (unsigned char *) malloc(dataSize);
+        memcpy(temp, (const void *) data, dataSize);
+        packet.data = temp;
+        packet.size = dataSize;
+        addHasDecodedAudioData(audioCodec.decode(packet));
         receiveAudioPacketCount++;
 
         return true;
@@ -449,4 +456,8 @@ void RGBHandler::reset() {
     rgbRenderer.reset();
     frameWidth = 0;
     frameHeight = 0;
+}
+
+void RGBHandler::setAudioDecodecParameters(int channels,int channelLayout, int sampleRate) {
+    audioCodec.setAudioCodecParameters(channels,channelLayout,sampleRate);
 }
