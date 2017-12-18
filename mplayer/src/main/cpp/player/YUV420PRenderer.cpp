@@ -1,10 +1,11 @@
 #include "YUV420PRenderer.h"
 #include <android/log.h>
+#include <string.h>
 #include "log.h"
 
 #ifdef LOG_TAG
 #undef LOG_TAG
-#define LOG_TAG "YUV420P_Player"
+#define LOG_TAG  "YUV420P_Player"
 #endif
 
 YUV420PRenderer::YUV420PRenderer() {
@@ -15,16 +16,25 @@ YUV420PRenderer::YUV420PRenderer() {
     y_pixels = NULL;
     u_pixels = NULL;
     v_pixels = NULL;
-    setup();
+    //setup();
 }
 
 YUV420PRenderer::~YUV420PRenderer() {
     iDrawWidth = 0;
     iDrawHeight = 0;
 
-    y_pixels = NULL;
-    u_pixels = NULL;
-    v_pixels = NULL;
+    if (y_pixels != NULL) {
+        free(y_pixels);
+        y_pixels = NULL;
+    }
+    if (u_pixels != NULL) {
+        free(u_pixels);
+        u_pixels = NULL;
+    }
+    if (v_pixels != NULL) {
+        free(v_pixels);
+        v_pixels = NULL;
+    }
 }
 
 bool YUV420PRenderer::setup() {
@@ -33,19 +43,27 @@ bool YUV420PRenderer::setup() {
     loadShader(); //load shader
     glUseProgram(gProgram);
 
+    //获取采样器索引
     GLuint textureUniformY = glGetUniformLocation(gProgram, "SamplerY");
     GLuint textureUniformU = glGetUniformLocation(gProgram, "SamplerU");
     GLuint textureUniformV = glGetUniformLocation(gProgram, "SamplerV");
     glUniform1i(textureUniformY, 0);
     glUniform1i(textureUniformU, 1);
     glUniform1i(textureUniformV, 2);
-
     return true;
 }
 
 void YUV420PRenderer::setFrameSize(int frameWidth, int frameHeight) {
+
     iFrameWidth = frameWidth;
     iFrameHeight = frameHeight;
+    if (y_pixels == NULL||u_pixels== NULL|| v_pixels==NULL) {
+        y_pixels = (uint8_t *) malloc(frameWidth * frameHeight);
+        u_pixels = (uint8_t *) malloc(frameWidth * frameHeight / 4);
+        v_pixels = (uint8_t *) malloc(frameWidth * frameHeight / 4);
+    }
+
+
 }
 
 
@@ -54,9 +72,9 @@ void YUV420PRenderer::clearFrame() {
      grey += 0.01f;
      if (grey > 1.0f) {
          grey = 0.0f;
-     }*/
-    //glClearColor(grey, grey, grey, 1.0f);
-    glClearColor(0, 0, 0, 0);
+     }
+     glClearColor(1, 1, 1, 1);*/
+    glClearColor(0, 0, 0, 0);//rgba,0~1
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
@@ -84,61 +102,54 @@ GLuint YUV420PRenderer::compileShader(const char *pSource, GLenum shaderType) {
     return shader;
 }
 
-void YUV420PRenderer::renderFrame(uint8_t **pixels) {
+void YUV420PRenderer::renderFrame(uint8_t **data) {
+    if (data == NULL || data[0] == NULL || data[1] == NULL || data[2] == NULL) {
+        LOGE("yuv data is null,please check again.")
+        return;
+    }
+
     clearFrame();
-
-    // frameData = pixels;
-    /* y_pixels = pixels;
-     u_pixels = pixels + iFrameWidth * iFrameHeight;
-     v_pixels = pixels + iFrameWidth * iFrameHeight * 5 / 4;*/
-    y_pixels = pixels[0];
-    u_pixels = pixels[1];
-    v_pixels = pixels[2];
-    // LOGI("renderFrame:--%d-%d", iFrameWidth, iFrameHeight);
-
-    glBindTexture(GL_TEXTURE_2D, _textureYUV[TEXY]);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, iFrameWidth, iFrameHeight, 0,
-                 GL_LUMINANCE, GL_UNSIGNED_BYTE, y_pixels);
-
-    glBindTexture(GL_TEXTURE_2D, _textureYUV[TEXU]);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, iFrameWidth / 2,
-                 iFrameHeight / 2, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, u_pixels);
-
-    glBindTexture(GL_TEXTURE_2D, _textureYUV[TEXV]);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, iFrameWidth / 2,
-                 iFrameHeight / 2, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, v_pixels);
-
-    glVertexAttribPointer(ATTRIB_VERTEX, 2, GL_FLOAT, 0, 0, squareVertices);
-    glEnableVertexAttribArray(ATTRIB_VERTEX);
-
-    glVertexAttribPointer(ATTRIB_TEXTURE, 2, GL_FLOAT, 0, 0, coordVertices);
-    glEnableVertexAttribArray(ATTRIB_TEXTURE);
-
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    uint8_t *y;
+    uint8_t *u;
+    uint8_t *v;
+    y = data[0];
+    u = data[1];
+    v = data[2];
+    if (y_pixels != NULL&&u_pixels!=NULL&&v_pixels!=NULL) {
+        memcpy(y_pixels, y, iFrameWidth * iFrameHeight);
+        memcpy(u_pixels, u, iFrameWidth * iFrameHeight / 4);
+        memcpy(v_pixels, v, iFrameWidth * iFrameHeight / 4);
+    }
+    //LOGI("%d,%d,%d", y_pixels, u_pixels, v_pixels);
+    bindYUVTexture();
+    LOGI("渲染成功  %ld", (long) *data);
 }
+
+void YUV420PRenderer::renderFrame(uint8_t *data) {
+    if (data == NULL) {
+        LOGE("yuv data is null,please check again.")
+        return;
+    }
+    clearFrame();
+    uint8_t *y;
+    uint8_t *u;
+    uint8_t *v;
+    y = data;
+    u = data + iFrameWidth * iFrameHeight;
+    v = data + iFrameWidth * iFrameHeight * 5 / 4;
+    if (y_pixels != NULL&&u_pixels!=NULL&&v_pixels!=NULL) {
+        memcpy(y_pixels, y, iFrameWidth * iFrameHeight);
+        memcpy(u_pixels, u, iFrameWidth * iFrameHeight / 4);
+        memcpy(v_pixels, v, iFrameWidth * iFrameHeight / 4);
+    }
+    bindYUVTexture();
+    LOGI("渲染成功  %ld", (long) data);
+}
+
 
 void YUV420PRenderer::renderFrame() {
     clearFrame();
-
-    glBindTexture(GL_TEXTURE_2D, _textureYUV[TEXY]);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, iFrameWidth, iFrameHeight, 0,
-                 GL_LUMINANCE, GL_UNSIGNED_BYTE, y_pixels);
-
-    glBindTexture(GL_TEXTURE_2D, _textureYUV[TEXU]);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, iFrameWidth / 2,
-                 iFrameHeight / 2, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, u_pixels);
-
-    glBindTexture(GL_TEXTURE_2D, _textureYUV[TEXV]);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, iFrameWidth / 2,
-                 iFrameHeight / 2, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, v_pixels);
-
-    glVertexAttribPointer(ATTRIB_VERTEX, 2, GL_FLOAT, 0, 0, squareVertices);
-    glEnableVertexAttribArray(ATTRIB_VERTEX);
-
-    glVertexAttribPointer(ATTRIB_TEXTURE, 2, GL_FLOAT, 0, 0, coordVertices);
-    glEnableVertexAttribArray(ATTRIB_TEXTURE);
-
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    bindYUVTexture();
 }
 
 void YUV420PRenderer::setupYUVTexture() {
@@ -222,6 +233,37 @@ void YUV420PRenderer::resetWindow(int winWidth, int winHeight) {
     iDrawWidth = winWidth;
     iDrawHeight = winHeight;
 
-    glViewport(0, 0, winWidth, winHeight);
+    glViewport(0, 0, iDrawWidth, iDrawHeight);
 
 }
+
+void YUV420PRenderer::bindYUVTexture() {
+    if(y_pixels==NULL||u_pixels==NULL||v_pixels==NULL){
+        return;
+    }
+    glBindTexture(GL_TEXTURE_2D, _textureYUV[TEXY]);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, iFrameWidth, iFrameHeight, 0,
+                 GL_LUMINANCE, GL_UNSIGNED_BYTE, y_pixels);
+
+    glBindTexture(GL_TEXTURE_2D, _textureYUV[TEXU]);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, iFrameWidth / 2,
+                 iFrameHeight / 2, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, u_pixels);
+
+    glBindTexture(GL_TEXTURE_2D, _textureYUV[TEXV]);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, iFrameWidth / 2,
+                 iFrameHeight / 2, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, v_pixels);
+
+    glVertexAttribPointer(ATTRIB_VERTEX, 2, GL_FLOAT, 0, 0, squareVertices);
+    glEnableVertexAttribArray(ATTRIB_VERTEX);
+
+    glVertexAttribPointer(ATTRIB_TEXTURE, 2, GL_FLOAT, 0, 0, coordVertices);
+    glEnableVertexAttribArray(ATTRIB_TEXTURE);
+
+    //绘制 从顶点0开始绘制，总共四个顶点，组成两个三角形，两个三角形拼接成一个矩形纹理，也就是我们的画面
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+}
+
+void YUV420PRenderer::init() {
+    setup();
+}
+

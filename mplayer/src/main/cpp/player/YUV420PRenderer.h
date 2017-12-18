@@ -17,8 +17,8 @@
   adjust the projection matrix.
  
  */
-#ifndef ROXLU_YUV420P_PLAYER_H
-#define ROXLU_YUV420P_PLAYER_H
+#ifndef VGIS_ANDROID_YUV420P_RENDERER_H
+#define VGIS_ANDROID_YUV420P_RENDERER_H
 
 #include <GLES2/gl2.h>
 #include <GLES2/gl2ext.h>
@@ -81,6 +81,10 @@ public:
 
     virtual ~YUV420PRenderer();
 
+    //初始化,在使用其他接口前调用（可多次调用）
+    //如果在使用中发现渲染不出画面，在确保数据无误的情况下，请再次调用此接口
+    void init();
+
     //重置窗口大小,需在渲染视频之前设置
     //winWidth：窗体宽度（即显示宽度）
     //winHeght：窗体高度
@@ -98,7 +102,12 @@ public:
     void renderFrame();
 
     //渲染新视频帧
-    void renderFrame(uint8_t **pixels);
+    //[in] data yuv数据(分组) 各数据分量：y=data[0],u=data[1],v=data[2]
+    void renderFrame(uint8_t **data);
+    //渲染新视频帧
+    //[in] data yuv数据(连续)
+    void renderFrame(uint8_t *data);
+
 
 private:
     uint8_t *y_pixels;
@@ -115,6 +124,7 @@ private:
 
     void loadShader();
 
+    void bindYUVTexture();
 
 public:
     //实际窗体大小

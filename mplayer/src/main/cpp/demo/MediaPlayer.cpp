@@ -292,6 +292,7 @@ bool MediaPlayer::createYuvRenderer() {
 
     LOGI("%d 正在创建YUV播放器", this);
     yuvRenderer = new YUV420PRenderer();
+    yuvRenderer->init();
     LOGI("%d 创建YUV播放器成功", this);
     return true;
 }
