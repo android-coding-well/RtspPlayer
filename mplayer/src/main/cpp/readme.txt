@@ -6,5 +6,3 @@ GRB渲染器(RGBRenderer)，音频播放器(AudioPlayer)，格式转换器(Conve
 
 demo中MediaPlayer.cpp是基于player目录下相关库实现了点流到解码到渲染的完整过程
 MediaPlayer2.cpp则是使用了RGBHandler实现了点流到解码到渲染的完整过程
-
-编译成功后的so位置：mplayer/build/intermediates/cmake/release/obj/armeabi/libstreamhandler-lib.so

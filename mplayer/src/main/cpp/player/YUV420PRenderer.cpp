@@ -2,8 +2,10 @@
 #include <android/log.h>
 #include "log.h"
 
-#define  LOG_TAG    "YUV420P_Player"
-
+#ifdef LOG_TAG
+#undef LOG_TAG
+#define LOG_TAG "YUV420P_Player"
+#endif
 
 YUV420PRenderer::YUV420PRenderer() {
     iDrawWidth = 0;

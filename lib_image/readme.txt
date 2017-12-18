@@ -1,0 +1,3 @@
+此库是从tensorflow官方demo中抽取出来的关于YUV与RGB的相互转换工具
+使用的话可以直接以module的方式引用，通过应用层调用接口
+或者拷贝c源码进行native层调用。

@@ -2,7 +2,10 @@
 #include "RGBHandler.h"
 #include "RetCode.h"
 
-#define  LOG_TAG    "RGBHandler"
+#ifdef LOG_TAG
+#undef LOG_TAG
+#define LOG_TAG "RGBHandler"
+#endif
 
 /**
  * 渲染线程

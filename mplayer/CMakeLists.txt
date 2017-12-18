@@ -4,13 +4,35 @@
 
 cmake_minimum_required(VERSION 3.4.1)
 
+
+# 定义源文件目录
+get_filename_component(CPP_SRC_DIR  ${CMAKE_SOURCE_DIR}/src/main/cpp  ABSOLUTE)
+# 定义源文件目录下的源文件
+file(GLOB_RECURSE cpp_sources ${CPP_SRC_DIR}/*.*)
+
+if (ANDROID_ABI MATCHES "^armeabi-v7a$")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mfloat-abi=softfp -mfpu=neon")
+elseif(ANDROID_ABI MATCHES "^arm64-v8a")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2 -ftree-vectorize")
+endif()
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DSTANDALONE_DEMO_LIB \
+                    -std=c++11 -fno-exceptions -fno-rtti -O2 -Wno-narrowing \
+                    -fPIE")
+set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} \
+                              -Wl,--allow-multiple-definition \
+                              -Wl,--whole-archive -fPIE -v")
+
+
+
+
 # Creates and names a library, sets it as either STATIC
 # or SHARED, and provides the relative paths to its source code.
 # You can define multiple libraries, and CMake builds it for you.
 # Gradle automatically packages shared libraries with your APK.
 
 add_library( # Sets the name of the library.
-             streamhandler-lib
+             streamhandler
 
              # Sets the library as a shared library.
              SHARED
@@ -18,22 +40,23 @@ add_library( # Sets the name of the library.
              # Provides a relative path to your source file(s).
              # Associated headers in the same location as their source
              # file are automatically included.
-             src/main/cpp/native-lib.cpp
-             src/main/cpp/streamhandler-lib.cpp
-             src/main/cpp/demo/MediaPlayer.cpp
-             src/main/cpp/demo/MediaPlayer2.cpp
-             src/main/cpp/player/YUV420PRenderer.cpp
-             src/main/cpp/player/RetCode.cpp
-             src/main/cpp/player/Codec.cpp
-             src/main/cpp/common/Jpeg.cpp
-             src/main/cpp/player/StreamTaker.cpp
-             src/main/cpp/player/AudioPlayer.cpp
-             src/main/cpp/player/Convertor.cpp
-             src/main/cpp/player/RGBRenderer.cpp
-             src/main/cpp/player/Optimize.cpp
-             src/main/cpp/player/NativeCodec.cpp
-             src/main/cpp/player/RGBHandler.cpp
-             src/main/cpp/player/YUVHandler.cpp
+             #src/main/cpp/native-lib.cpp
+             #src/main/cpp/streamhandler-lib.cpp
+             #src/main/cpp/demo/MediaPlayer.cpp
+             #src/main/cpp/demo/MediaPlayer2.cpp
+             #src/main/cpp/player/YUV420PRenderer.cpp
+             #src/main/cpp/player/RetCode.cpp
+             #src/main/cpp/player/Codec.cpp
+             #src/main/cpp/common/Jpeg.cpp
+             #src/main/cpp/player/StreamTaker.cpp
+             #src/main/cpp/player/AudioPlayer.cpp
+             #src/main/cpp/player/Convertor.cpp
+             #src/main/cpp/player/RGBRenderer.cpp
+             #src/main/cpp/player/Optimize.cpp
+             #src/main/cpp/player/NativeCodec.cpp
+             #src/main/cpp/player/RGBHandler.cpp
+             #src/main/cpp/player/YUVHandler.cpp
+              ${cpp_sources}
              )
 
 
@@ -91,7 +114,7 @@ find_library( # Sets the name of the path variable.
 # build script, prebuilt third-party libraries, or system libraries.
 
 target_link_libraries( # Specifies the target library.
-                       streamhandler-lib
+                       streamhandler
                        avcodec-lib
                        avdevice-lib
                        avfilter-lib
@@ -109,3 +132,13 @@ target_link_libraries( # Specifies the target library.
                        # included in the NDK.
                        ${log-lib} )
 
+#升级到gradle4之后会报错误：More than one file was found with OS independent path 'lib/armeabi/libstreamhandler.so'
+#解决办法有两个：一是删除jniLibs/armeabi/libstreamhandler.so,同时注释掉下面生成so输出路径的语句即可
+#二是在当前build.gradle中添加 android{ packagingOptions { pickFirst 'lib/armeabi/libstreamhandler.so' }}
+
+#在指定目录生成so文件，注意目录区分大小写，如jniLibs_DIR的“jniLibs”必须和后面build.gradle指定的sourceSet目录中指定的“jniLibs”完全一致
+set(jniLibs_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/main/jniLibs)
+set_target_properties( streamhandler
+                             PROPERTIES
+                             LIBRARY_OUTPUT_DIRECTORY
+                             "${jniLibs_DIR}/${ANDROID_ABI}")

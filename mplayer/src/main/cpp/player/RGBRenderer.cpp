@@ -8,7 +8,10 @@
 extern "C" {
 #include "libavutil/imgutils.h"
 }
-#define  LOG_TAG    "GRBRenderer"
+#ifdef LOG_TAG
+#undef LOG_TAG
+#define LOG_TAG "GRBRenderer"
+#endif
 
 RGBRenderer::RGBRenderer() {
     rgbSize=2;//默认WINDOW_FORMAT_RGB_565

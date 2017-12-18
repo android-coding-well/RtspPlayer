@@ -6,8 +6,10 @@
 #include "YUVHandler.h"
 #include "RetCode.h"
 
-#define  LOG_TAG    "YUVHandler"
-
+#ifdef LOG_TAG
+#undef LOG_TAG
+#define LOG_TAG "YUVHandler"
+#endif
 YUVHandler::YUVHandler() {
     //线程初始化
     pthread_attr_init(&renderAttr); /*初始化,得到默认的属性值*/

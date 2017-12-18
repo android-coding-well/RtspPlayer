@@ -1,8 +1,8 @@
 #include <jni.h>
 #include <string>
-#include"log.h"
-#include "demo/MediaPlayer.h"
-#include "player/RetCode.h"
+#include "../demo/MediaPlayer.h"
+#include "../player/RetCode.h"
+#include "../include/log.h"
 #include <unistd.h>
 #include <android/native_window_jni.h>
 

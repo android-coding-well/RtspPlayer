@@ -1,1 +1,1 @@
-include ':app', ':mplayer'
+include ':app', ':mplayer', ':lib_image'

@@ -1,8 +1,8 @@
 #include <jni.h>
 #include <string>
-#include"log.h"
-#include "player/RetCode.h"
-#include "demo/MediaPlayer2.h"
+#include "../player/RetCode.h"
+#include "../demo/MediaPlayer2.h"
+#include "../include/log.h"
 #include <unistd.h>
 #include <android/native_window_jni.h>
 
@@ -225,4 +225,3 @@ Java_com_gosuncn_mplay_PlayerJNI3_getDecodeFailedAudioCount(JNIEnv *env, jobject
 
 
 }
-

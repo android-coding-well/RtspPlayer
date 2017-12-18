@@ -7,8 +7,10 @@
 #include "log.h"
 #include "RetCode.h"
 
-#define  LOG_TAG    "StreamTaker"
-
+#ifdef LOG_TAG
+#undef LOG_TAG
+#define LOG_TAG "StreamTaker"
+#endif
 /**
  * 取流线程
  */

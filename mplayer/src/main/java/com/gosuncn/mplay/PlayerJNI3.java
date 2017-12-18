@@ -8,7 +8,7 @@ package com.gosuncn.mplay;
 
 public class PlayerJNI3 {
     static {
-        System.loadLibrary("streamhandler-lib");
+        System.loadLibrary("streamhandler");
     }
     private PlayerJNI3(){}
     private static PlayerJNI3 instance;

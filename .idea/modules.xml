@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/RtspPlayer.iml" filepath="$PROJECT_DIR$/RtspPlayer.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/lib_image/lib_image.iml" filepath="$PROJECT_DIR$/lib_image/lib_image.iml" />
       <module fileurl="file://$PROJECT_DIR$/mplayer/mplayer.iml" filepath="$PROJECT_DIR$/mplayer/mplayer.iml" />
     </modules>
   </component>
