@@ -40,22 +40,6 @@ add_library( # Sets the name of the library.
              # Provides a relative path to your source file(s).
              # Associated headers in the same location as their source
              # file are automatically included.
-             #src/main/cpp/native-lib.cpp
-             #src/main/cpp/streamhandler-lib.cpp
-             #src/main/cpp/demo/MediaPlayer.cpp
-             #src/main/cpp/demo/MediaPlayer2.cpp
-             #src/main/cpp/player/YUV420PRenderer.cpp
-             #src/main/cpp/player/RetCode.cpp
-             #src/main/cpp/player/Codec.cpp
-             #src/main/cpp/common/Jpeg.cpp
-             #src/main/cpp/player/StreamTaker.cpp
-             #src/main/cpp/player/AudioPlayer.cpp
-             #src/main/cpp/player/Convertor.cpp
-             #src/main/cpp/player/RGBRenderer.cpp
-             #src/main/cpp/player/Optimize.cpp
-             #src/main/cpp/player/NativeCodec.cpp
-             #src/main/cpp/player/RGBHandler.cpp
-             #src/main/cpp/player/YUVHandler.cpp
               ${cpp_sources}
              )
 
